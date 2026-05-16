@@ -2,7 +2,7 @@
 
     {{-- Mobile brand mark (CSS hides this on desktop) --}}
     <div class="brand-mobile">
-        🎓 Smart<span class="dot">Tasker</span>
+        🎓 Smar<span class="dot">Tasker</span>
     </div>
 
     <h2>Welcome back</h2>
@@ -98,7 +98,7 @@
 
         {{-- ── Footer ── --}}
         <div style="text-align:center; margin-top:1.4rem;">
-            <span style="font-size:.72rem; color:rgba(255,255,255,.22);">🎓 SmartTasker &copy; {{ date('Y') }}</span>
+            <span style="font-size:.72rem; color:rgba(255,255,255,.22);">🎓 SmarTasker &copy; {{ date('Y') }}</span>
         </div>
 
     </form>

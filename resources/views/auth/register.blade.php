@@ -432,7 +432,7 @@
 
 {{-- ── Mobile brand mark (hidden on desktop by guest layout) ── --}}
 <div class="brand-mobile">
-    🎓 Smart<span class="dot">Tasker</span>
+    🎓 Smar<span class="dot">Tasker</span>
 </div>
 
 <h2>Create your account</h2>
@@ -707,7 +707,7 @@
 
     <button type="submit" class="btn-submit-reg" id="submitBtn">
         <i class="bi bi-rocket-takeoff-fill"></i>
-        Launch my SmartTasker
+        Launch my SmarTasker
     </button>
 
     <div class="already-link">

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'SmartTasker') }}</title>
+    <title>{{ config('app.name', 'SmarTasker') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -353,7 +353,7 @@
 
     {{-- ── Left branding panel (desktop only) ── --}}
     <div class="panel-left">
-        <div class="brand-logo">🎓 Smart<span>Tasker</span></div>
+        <div class="brand-logo">🎓 Smar<span>Tasker</span></div>
 
         <h1>Your academic<br><em>command centre.</em></h1>
         <p class="tagline">
