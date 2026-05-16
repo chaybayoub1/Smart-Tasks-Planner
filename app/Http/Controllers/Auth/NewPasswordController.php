@@ -3,61 +3,75 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\PasswordResetOtp;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class NewPasswordController extends Controller
 {
     /**
-     * Display the password reset view.
+     * Display the password reset form.
+     * Guard: user must have passed OTP verification in this session.
      */
-    public function create(Request $request): View
+    public function create(Request $request): View|RedirectResponse
     {
+        // Verify the URL token matches the session token set after OTP verification
+        $sessionToken = session('otp_reset_token');
+        $urlToken     = $request->route('token');
+
+        if (! session('otp_verified') || ! $sessionToken || $sessionToken !== $urlToken) {
+            return redirect()->route('password.request')
+                ->withErrors(['email' => 'Please complete email verification first.']);
+        }
+
         return view('auth.reset-password', ['request' => $request]);
     }
 
     /**
-     * Handle an incoming new password request.
-     *
-     * @throws ValidationException
+     * Update the user's password.
      */
     public function store(Request $request): RedirectResponse
     {
+        // Re-validate the session guard
+        $sessionToken = session('otp_reset_token');
+        $urlToken     = $request->input('token');
+
+        if (! session('otp_verified') || ! $sessionToken || $sessionToken !== $urlToken) {
+            return redirect()->route('password.request')
+                ->withErrors(['email' => 'Session expired or invalid. Please start again.']);
+        }
+
         $request->validate([
-            'token' => ['required'],
-            'email' => ['required', 'email'],
+            'token'    => ['required'],
+            'email'    => ['required', 'email', 'exists:users,email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user) use ($request) {
-                $user->forceFill([
-                    'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+        $user = User::where('email', $request->email)->first();
 
-                event(new PasswordReset($user));
-            }
-        );
+        if (! $user) {
+            return back()->withErrors(['email' => 'No user found with that email address.']);
+        }
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the application's home authenticated view. If there is an error we can
-        // redirect them back to where they came from with their error message.
-        return $status == Password::PASSWORD_RESET
-                    ? redirect()->route('login')->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+        // Update password
+        $user->forceFill([
+            'password'       => Hash::make($request->password),
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        event(new PasswordReset($user));
+
+        // Clean up: delete OTP record and clear session keys
+        PasswordResetOtp::clearFor($request->email);
+        session()->forget(['otp_email', 'otp_verified', 'otp_reset_token']);
+
+        return redirect()->route('login')
+            ->with('status', 'Your password has been reset successfully. Please sign in.');
     }
 }

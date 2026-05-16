@@ -9,9 +9,11 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Auth\VerifyOtpController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
+
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
@@ -22,20 +24,37 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
+    // ── OTP-based Password Reset ──────────────────────────────────────────
+
+    // Step 1: show "Forgot Password" form / submit email → sends OTP
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
         ->name('password.email');
 
+    // Step 2: show OTP entry form / submit OTP / resend OTP
+    Route::get('verify-otp', [VerifyOtpController::class, 'create'])
+        ->name('password.verify-otp');
+
+    Route::post('verify-otp', [VerifyOtpController::class, 'store'])
+        ->name('password.verify-otp.store');
+
+    Route::post('verify-otp/resend', [VerifyOtpController::class, 'resend'])
+        ->name('password.verify-otp.resend');
+
+    // Step 3: show new-password form / update password
+    // Token here is a session token (NOT the default Laravel password-reset token)
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
+        ->name('password.reset.otp');
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
 });
 
 Route::middleware('auth')->group(function () {
+
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
@@ -52,8 +71,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
-    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
+    Route::put('password', [PasswordController::class, 'update'])
+        ->name('password.update');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
 });
