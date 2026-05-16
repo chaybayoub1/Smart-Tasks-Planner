@@ -14,15 +14,16 @@ use App\Http\Controllers\ExamController;
 Route::get('/', fn() => redirect()->route('dashboard'));
 
 // ── Auth routes (Breeze) ──────────────────────────────────────
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // ── Protected routes ──────────────────────────────────────────
-Route::middleware(['auth', 'verified'])->group(function () {
+// Changed: 'verified' → 'email.verified'  (our custom middleware alias)
+Route::middleware(['auth', 'email.verified'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Subjects (inline forms, no dedicated show page)
+    // Subjects
     Route::resource('subjects', SubjectController::class)->except(['show', 'create', 'edit']);
 
     // Tasks
@@ -34,16 +35,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/notes/{note}/pin', [NoteController::class, 'togglePin'])->name('notes.pin');
 
     // Pomodoro
-    Route::get('/pomodoro',         [PomodoroController::class, 'index'])->name('pomodoro.index');
-    Route::post('/pomodoro/session',[PomodoroController::class, 'store'])->name('pomodoro.store');
+    Route::get('/pomodoro',          [PomodoroController::class, 'index'])->name('pomodoro.index');
+    Route::post('/pomodoro/session', [PomodoroController::class, 'store'])->name('pomodoro.store');
 
     // Flashcards
     Route::resource('flashcards', FlashcardController::class)->except(['show', 'create']);
-    Route::get('/flashcards/review',                              [FlashcardController::class, 'review'])->name('flashcards.review');
-    Route::patch('/flashcards/{flashcard}/difficulty',            [FlashcardController::class, 'markDifficulty'])->name('flashcards.difficulty');
+    Route::get('/flashcards/review',                   [FlashcardController::class, 'review'])->name('flashcards.review');
+    Route::patch('/flashcards/{flashcard}/difficulty', [FlashcardController::class, 'markDifficulty'])->name('flashcards.difficulty');
 
     // Exams
     Route::resource('exams', ExamController::class)->except(['show', 'create']);
 
-    // Profile (Breeze provides this, just re-declare if needed)
 });
