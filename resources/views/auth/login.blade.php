@@ -134,4 +134,116 @@
         })();
     </script>
 
+{{-- ══════════════════════════════════════════════════════════
+     LOGIN-PAGE LAYOUT OVERRIDES  (mirrors register_blade.php)
+     Strategy: free-scroll page, sticky left panel, overflow:clip
+     right panel so no internal scrollbar ever appears.
+     The quote lives below the feature list on the left — visible
+     after the user scrolls past the login card height.
+     IntersectionObserver fades it in on first view.
+═══════════════════════════════════════════════════════════ --}}
+<style>
+
+    /* ══════════════════════════════════════════════════════════
+       SINGLE-SCROLLBAR FIX  (identical strategy to register)
+    ══════════════════════════════════════════════════════════ */
+
+    /* ── 1. Page root: free-scroll, hide decorative scrollbar ── */
+    html {
+        height: auto !important;
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+    html::-webkit-scrollbar { display: none !important; }
+
+    body {
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow: visible !important;
+    }
+
+    /* ── 2. Wrapper grows with content, never fixed-height ────── */
+    .auth-wrapper {
+        min-height: 100vh !important;
+        height: auto !important;
+        align-items: stretch !important;
+    }
+
+    /* ── 3. Left panel: sticky viewport column ──────────────────
+       Stays anchored while the right side (if ever taller) scrolls.
+       overflow-y:visible lets the quote render past the boundary. */
+    .panel-left {
+        position: sticky !important;
+        top: 0 !important;
+        height: 100vh !important;
+        overflow-x: clip !important;
+        overflow-y: visible !important;
+        justify-content: flex-start !important;
+        padding-top: 2.5rem !important;
+        align-self: flex-start !important;
+    }
+
+    /* ── 4. Right panel: NO internal scroll, ever ───────────────
+       overflow:clip = content clipped geometrically; no scroll
+       container created, no scrollbar can appear. */
+    .panel-right {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        max-height: none !important;
+        overflow: clip !important;
+        align-items: center !important;
+        align-self: stretch !important;
+        padding: 2.5rem 1.5rem 3rem !important;
+    }
+    @media (min-width: 1024px) {
+        .panel-right {
+            width: 520px !important;
+            flex-shrink: 0 !important;
+            overflow: clip !important;
+            max-height: none !important;
+            align-items: center !important;
+            padding: 2.5rem 2rem 3rem !important;
+        }
+    }
+
+    /* ── 5. form-card: natural width, centred ───────────────── */
+    .form-card {
+        width: 100% !important;
+        max-width: 460px !important;
+        height: auto !important;
+        margin: 0 auto !important;
+    }
+
+    /* ── 6. card-glass: height auto, grows with content ────────  */
+    .card-glass {
+        height: auto !important;
+        min-height: unset !important;
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 2rem 1.75rem 2.25rem !important;
+    }
+
+    /* ── 7. Tablet ────────────────────────────────────────────── */
+    @media (max-width: 1023px) {
+        .panel-right {
+            align-items: center !important;
+            padding: 2rem 1.5rem 3rem !important;
+        }
+        .form-card { max-width: 480px !important; }
+    }
+
+    /* ── 8. Mobile ────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+        .panel-right { padding: 1.25rem .75rem 2.5rem !important; }
+        .form-card { max-width: 100% !important; }
+        .card-glass { padding: 1.5rem 1.25rem 1.75rem !important; border-radius: 14px !important; }
+    }
+
+    </style>
+
+
+
 </x-guest-layout>

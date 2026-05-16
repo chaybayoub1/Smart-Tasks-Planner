@@ -142,21 +142,21 @@
         }
         @media (min-width: 1024px) {
             .panel-right {
-                width: 480px; flex-shrink: 0;
+                width: 580px; flex-shrink: 0;
                 background: rgba(255,255,255,.03);
                 border-left: 1px solid rgba(255,255,255,.07);
                 backdrop-filter: blur(20px);
                 /* scroll within column when viewport is very short */
                 overflow-y: auto;
                 max-height: 100vh;
-                padding: 2.5rem 1.5rem;
+                padding: 2.5rem 2rem;
                 align-items: center;
             }
         }
 
         /* ── Form card ──────────────────────────────────────────── */
         .form-card {
-            width: 100%; max-width: 420px;
+            width: 100%; max-width: 520px;
             animation: slideUp .5s cubic-bezier(.16,1,.3,1) both;
         }
         @keyframes slideUp {
@@ -167,8 +167,8 @@
         .card-glass {
             background: rgba(255,255,255,.07);
             border: 1px solid rgba(255,255,255,.12);
-            border-radius: 20px;
-            padding: 2.25rem 2rem;
+            border-radius: 24px;
+            padding: 2.75rem 2.5rem;
             backdrop-filter: blur(24px);
             box-shadow: 0 24px 60px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.08) inset;
         }
@@ -187,15 +187,15 @@
         /* ── Heading / subtitle ─────────────────────────────────── */
         .card-glass h2 {
             font-family: 'Sora', sans-serif;
-            font-size: 1.55rem; font-weight: 700;
-            color: #fff; letter-spacing: -.02em; margin-bottom: .35rem;
+            font-size: 1.75rem; font-weight: 700;
+            color: #fff; letter-spacing: -.02em; margin-bottom: .4rem;
         }
         .card-glass .subtitle {
-            color: rgba(255,255,255,.45); font-size: .875rem; margin-bottom: 1.75rem;
+            color: rgba(255,255,255,.45); font-size: .9rem; margin-bottom: 2rem;
         }
 
         /* ── Input groups ───────────────────────────────────────── */
-        .input-group-st { position: relative; margin-bottom: 1rem; }
+        .input-group-st { position: relative; margin-bottom: 1.25rem; }
 
         .input-group-st label {
             display: block; font-size: .72rem; font-weight: 600;
@@ -221,12 +221,12 @@
         /* right toggle button — centred inside input row */
         .input-icon-right {
             position: absolute; right: 0; top: 0; bottom: 0;
-            width: 46px;
+            width: 50px;
             display: flex; align-items: center; justify-content: center;
             color: rgba(255,255,255,.45); font-size: 1.1rem;
             background: none; border: none;
             cursor: pointer; z-index: 2;
-            border-radius: 0 10px 10px 0;
+            border-radius: 0 12px 12px 0;
             transition: color .2s, background .2s;
         }
         .input-icon-right:hover {
@@ -240,11 +240,11 @@
         .input-group-st input[type="password"],
         .input-group-st input[type="text"] {
             width: 100%;
-            padding: .75rem 3rem .75rem 2.6rem;
+            padding: .95rem 3rem .95rem 2.8rem;
             background: rgba(255,255,255,.08);
             border: 1px solid rgba(255,255,255,.12);
-            border-radius: 10px;
-            color: #fff; font-size: .9rem; font-family: 'Inter', sans-serif;
+            border-radius: 12px;
+            color: #fff; font-size: .95rem; font-family: 'Inter', sans-serif;
             outline: none;
             transition: border-color .2s, background .2s, box-shadow .2s;
         }
@@ -280,20 +280,20 @@
 
         /* ── Primary login button ───────────────────────────────── */
         .btn-primary-st {
-            width: 100%; padding: .85rem 1.5rem;
+            width: 100%; padding: 1.05rem 1.75rem;
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            border: none; border-radius: 10px;
+            border: none; border-radius: 12px;
             color: #fff; font-family: 'Sora', sans-serif;
-            font-size: .95rem; font-weight: 600; letter-spacing: .01em;
+            font-size: 1.05rem; font-weight: 700; letter-spacing: .03em;
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: .5rem;
+            display: flex; align-items: center; justify-content: center; gap: .6rem;
             transition: transform .15s, box-shadow .15s, filter .15s;
-            box-shadow: 0 4px 20px rgba(99,102,241,.4);
+            box-shadow: 0 6px 24px rgba(99,102,241,.45);
         }
         .btn-primary-st:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 28px rgba(99,102,241,.55);
-            filter: brightness(1.07);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(99,102,241,.6);
+            filter: brightness(1.09);
         }
         .btn-primary-st:active { transform: translateY(0); }
 
@@ -309,11 +309,11 @@
 
         /* ── Register button (amber, clearly visible) ───────────── */
         .btn-register-st {
-            width: 100%; padding: .8rem 1.5rem;
+            width: 100%; padding: .9rem 1.75rem;
             background: linear-gradient(135deg, rgba(245,158,11,.20) 0%, rgba(245,158,11,.12) 100%);
-            border: 1.5px solid rgba(245,158,11,.6); border-radius: 10px;
+            border: 1.5px solid rgba(245,158,11,.6); border-radius: 12px;
             color: #fcd34d; font-family: 'Sora', sans-serif;
-            font-size: .9rem; font-weight: 600; letter-spacing: .01em;
+            font-size: .95rem; font-weight: 600; letter-spacing: .01em;
             cursor: pointer; text-decoration: none;
             display: flex; align-items: center; justify-content: center; gap: .5rem;
             transition: background .18s, border-color .18s, color .18s, box-shadow .18s;
