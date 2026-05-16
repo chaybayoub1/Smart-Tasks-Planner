@@ -214,7 +214,7 @@ Four diagrams cover every authentication scenario currently implemented. The sco
 
 Shows the full lifecycle from `POST /register` through `EmailVerificationCodeMail` dispatch, OTP storage in `email_verification_codes`, and validation in `VerifyOtpController` — including happy path and error path.
 
-![Registration & Email Verification](docs/images/Registration Email Verification.png)
+![Registration & Email Verification](registration-email-verification.png)
 
 ---
 
@@ -223,7 +223,7 @@ Shows the full lifecycle from `POST /register` through `EmailVerificationCodeMai
 
 Decision tree from credential submission through the `EnsureEmailIsVerified` middleware guard. Covers three terminal states: dashboard access, verify-email redirect, and rate-limit lockout.
 
-![Login Flow](docs/images/Login Flow.png)
+![Login Flow](docs/images/login-flow.png)
 
 ---
 
@@ -232,7 +232,7 @@ Decision tree from credential submission through the `EnsureEmailIsVerified` mid
 
 Two-phase OTP reset: `POST /forgot-password` dispatches `SendOtpMail` and inserts a timed record; `POST /reset-password` validates the code, updates the bcrypt hash, and removes the OTP row. Email enumeration is prevented by returning the same response regardless of whether the address exists.
 
-![Forgot Password via OTP](docs/images/Forgot Password via OTP.png)
+![Forgot Password via OTP](forgot-password-otp.png)
 
 ---
 
@@ -241,7 +241,7 @@ Two-phase OTP reset: `POST /forgot-password` dispatches `SendOtpMail` and insert
 
 Maps every session state a user can occupy (Guest → Registering → PendingVerification → Authenticated, plus the PasswordResetFlow branch) and the transitions enforced by the application and its middleware.
 
-![Authentication State Machine](docs/images/Authentication State Machine.png)
+![Authentication State Machine](docs/images/authentication-state-machine.png)
 
 ---
 
