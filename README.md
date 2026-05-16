@@ -248,7 +248,7 @@ Maps every session state a user can occupy (Guest → Registering → PendingVer
 ## 🎥 Demo Videos
 
 > Demo videos of the implemented authentication workflows.
-## 🎥 Demo Videos
+
 
 ### 1️⃣ Registration & Email Verification
 
