@@ -214,7 +214,7 @@ Four diagrams cover every authentication scenario currently implemented. The sco
 
 Shows the full lifecycle from `POST /register` through `EmailVerificationCodeMail` dispatch, OTP storage in `email_verification_codes`, and validation in `VerifyOtpController` — including happy path and error path.
 
-![Registration & Email Verification](registration-email-verification.png)
+![Registration & Email Verification](docs/images/registration-email-verification.png)
 
 ---
 
@@ -232,7 +232,7 @@ Decision tree from credential submission through the `EnsureEmailIsVerified` mid
 
 Two-phase OTP reset: `POST /forgot-password` dispatches `SendOtpMail` and inserts a timed record; `POST /reset-password` validates the code, updates the bcrypt hash, and removes the OTP row. Email enumeration is prevented by returning the same response regardless of whether the address exists.
 
-![Forgot Password via OTP](forgot-password-otp.png)
+![Forgot Password via OTP](docs/images/forgot-password-otp.png)
 
 ---
 
@@ -248,31 +248,30 @@ Maps every session state a user can occupy (Guest → Registering → PendingVer
 ## 🎥 Demo Videos
 
 > Demo videos of the implemented authentication workflows.
+## 🎥 Demo Videos
 
 ### 1️⃣ Registration & Email Verification
 
-[![Registration Demo](https://drive.google.com/file/d/1HcnEnr9TKq6Er__Cvp7YLnFvTdEVeE1Z/view?usp=sharing)
+[▶ Watch Registration Demo](https://drive.google.com/file/d/1HcnEnr9TKq6Er__Cvp7YLnFvTdEVeE1Z/view?usp=sharing)
 
 Covers:
 - User registration
-- Verification code email
+- Verification email
 - OTP verification
-- Redirect to dashboard
+- Dashboard access
 
 ---
 
-### 2️⃣ Forgot Password, Login & Logout Flow
+### 2️⃣ Forgot Password → Reset Password → Login → Logout
 
-[![Password Reset Demo](https://drive.google.com/file/d/1IYufrJ1YU73GJOOI8vgWTNAgXbycI7Qj/view?usp=sharing)
+[▶ Watch Password Reset Demo](https://drive.google.com/file/d/1IYufrJ1YU73GJOOI8vgWTNAgXbycI7Qj/view?usp=sharing)
 
 Covers:
-- Forgot password request
-- OTP email delivery
+- Forgot password
+- OTP reset
 - Password reset
-- Login with new password
-- Dashboard access
-- Logout functionality
----
+- Login
+- Logout
 
 ## 🗂️ Project Structure (Key Files)
 
