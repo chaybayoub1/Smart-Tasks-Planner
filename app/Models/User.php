@@ -19,21 +19,21 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
     }
 
-    // ── Relationships ─────────────────────────────────────────
-    public function subjects()      { return $this->hasMany(Subject::class); }
-    public function tasks()         { return $this->hasMany(Task::class); }
-    public function notes()         { return $this->hasMany(Note::class); }
+    // ── Relationships ─────────────────────────────────────────────────────────
+    public function subjects()         { return $this->hasMany(Subject::class); }
+    public function tasks()            { return $this->hasMany(Task::class); }
+    public function notes()            { return $this->hasMany(Note::class); }
     public function pomodoroSessions() { return $this->hasMany(PomodoroSession::class); }
-    public function streak()        { return $this->hasOne(Streak::class); }
-    public function flashcards()    { return $this->hasMany(Flashcard::class); }
-    public function exams()         { return $this->hasMany(Exam::class); }
-    public function badges()        { return $this->belongsToMany(Badge::class, 'user_badges')->withPivot('earned_at'); }
+    public function streak()           { return $this->hasOne(Streak::class); }
+    public function flashcards()       { return $this->hasMany(Flashcard::class); }
+    public function exams()            { return $this->hasMany(Exam::class); }
+    public function badges()           { return $this->belongsToMany(Badge::class, 'user_badges')->withPivot('earned_at'); }
 
-    // ── Gamification helpers ───────────────────────────────────
+    // ── Gamification helpers ──────────────────────────────────────────────────
 
     /**
      * XP required to reach a given level: 100 * level^1.5
@@ -48,13 +48,16 @@ class User extends Authenticatable
         return $this->xpForLevel($this->level + 1);
     }
 
+    /**
+     * Progress percentage (0–100) toward the next level.
+     */
     public function xpProgress(): int
     {
-        // XP accumulated toward the next level (reset each level)
         $xpThisLevel = $this->xpForLevel($this->level);
         $xpNextLevel = $this->xpForNextLevel();
-        $earned = $this->xp - $xpThisLevel;
-        $needed  = $xpNextLevel - $xpThisLevel;
+        $earned      = $this->xp - $xpThisLevel;
+        $needed      = $xpNextLevel - $xpThisLevel;
+
         return $needed > 0 ? max(0, (int) (($earned / $needed) * 100)) : 100;
     }
 
@@ -62,7 +65,6 @@ class User extends Authenticatable
     {
         $this->xp += $amount;
 
-        // Level up while XP exceeds threshold
         while ($this->xp >= $this->xpForNextLevel()) {
             $this->level++;
         }
@@ -70,28 +72,13 @@ class User extends Authenticatable
         $this->save();
     }
 
-    // ── Computed stats ─────────────────────────────────────────
-
-    public function totalStudyMinutes(): int
-    {
-        return (int) $this->pomodoroSessions()
-            ->where('completed', true)
-            ->where('type', 'focus')
-            ->sum('duration');
-    }
-
-    public function weeklyStudyMinutes(): array
-    {
-        $data = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->toDateString();
-            $mins = (int) $this->pomodoroSessions()
-                ->where('completed', true)
-                ->where('type', 'focus')
-                ->whereDate('created_at', $date)
-                ->sum('duration');
-            $data[] = ['date' => $date, 'minutes' => $mins];
-        }
-        return $data;
-    }
+    // ── NOTE ─────────────────────────────────────────────────────────────────
+    // totalStudyMinutes() and weeklyStudyMinutes() have been removed.
+    // All study/task aggregation is now handled by ProductivityService,
+    // which avoids per-user N+1 queries and keeps the model free of
+    // business logic. Update any Blade views that called these methods
+    // to use the $studyStats array passed from the controller instead:
+    //
+    //   Old: $user->totalStudyMinutes()      → $studyStats['total_study_minutes']
+    //   Old: $user->weeklyStudyMinutes()     → use getWeeklyTasksChart() or getStudyStatistics()
 }

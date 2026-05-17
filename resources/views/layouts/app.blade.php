@@ -26,13 +26,17 @@
 
         /* ── Sidebar ────────────────────────────────── */
         #sidebar {
-            width: 250px; min-height: 100vh;
+            width: 250px;
+            height: 100vh;
             background: var(--sf-sidebar);
             position: fixed; top:0; left:0; z-index:100;
             display: flex; flex-direction: column;
             transition: transform .25s ease;
         }
+
+        /* Brand strip — pinned at top, never scrolls */
         #sidebar .sidebar-brand {
+            flex-shrink: 0;
             padding: 1.25rem 1.5rem;
             color: #fff; font-size: 1.3rem; font-weight: 700;
             border-bottom: 1px solid rgba(255,255,255,.1);
@@ -42,6 +46,17 @@
             font-size:.65rem; background: var(--sf-accent);
             color:#000; border-radius:20px; padding:2px 8px;
         }
+
+        /* Scrollable nav zone */
+        #sidebar .sidebar-scroll {
+            flex: 1 1 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        #sidebar .sidebar-scroll::-webkit-scrollbar { display: none; }
+
         #sidebar nav a {
             display: flex; align-items: center; gap:.75rem;
             padding: .65rem 1.5rem; color: rgba(255,255,255,.7);
@@ -54,12 +69,120 @@
             padding-left: calc(1.5rem - 3px);
         }
         #sidebar nav a i { font-size:1.1rem; width:20px; text-align:center; }
+
+        /* Footer — pinned at bottom, never scrolls */
         #sidebar .sidebar-footer {
-            margin-top: auto; padding: 1rem 1.5rem;
+            flex-shrink: 0;
+            padding: .875rem 1rem 1rem;
             border-top: 1px solid rgba(255,255,255,.1);
         }
-        #sidebar .xp-bar { height:6px; background:rgba(255,255,255,.15); border-radius:99px; overflow:hidden; }
+
+        /* XP bar (kept above insight widget) */
+        #sidebar .xp-strip {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 5px;
+        }
+        #sidebar .xp-bar { height:5px; background:rgba(255,255,255,.15); border-radius:99px; overflow:hidden; margin-bottom:10px; }
         #sidebar .xp-bar-fill { height:100%; background: var(--sf-primary); border-radius:99px; transition: width .4s ease; }
+
+        /* ── Smart Insight Widget ───────────────────── */
+        .insight-widget {
+            border-radius: 10px;
+            padding: 11px 13px;
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow .2s ease, transform .2s ease;
+            cursor: default;
+        }
+        .insight-widget:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,0,0,.25);
+        }
+
+        /* Tone variants */
+        .insight-widget.tone-positive {
+            background: linear-gradient(135deg, rgba(16,185,129,.18) 0%, rgba(99,102,241,.22) 100%);
+            border: 1px solid rgba(16,185,129,.3);
+        }
+        .insight-widget.tone-warning {
+            background: linear-gradient(135deg, rgba(244,63,94,.18) 0%, rgba(245,158,11,.18) 100%);
+            border: 1px solid rgba(244,63,94,.3);
+        }
+        .insight-widget.tone-neutral {
+            background: linear-gradient(135deg, rgba(99,102,241,.15) 0%, rgba(139,92,246,.15) 100%);
+            border: 1px solid rgba(139,92,246,.25);
+        }
+
+        /* Subtle animated glow on the top edge */
+        .insight-widget::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            border-radius: 10px 10px 0 0;
+            animation: insightGlow 3s ease-in-out infinite;
+        }
+        .tone-positive::before { background: linear-gradient(90deg, #10b981, #6366f1, #10b981); background-size: 200%; }
+        .tone-warning::before  { background: linear-gradient(90deg, #f43f5e, #f59e0b, #f43f5e); background-size: 200%; }
+        .tone-neutral::before  { background: linear-gradient(90deg, #6366f1, #8b5cf6, #6366f1); background-size: 200%; }
+
+        @keyframes insightGlow {
+            0%   { background-position: 0%   50%; opacity: .7; }
+            50%  { background-position: 100% 50%; opacity: 1; }
+            100% { background-position: 0%   50%; opacity: .7; }
+        }
+
+        .insight-label {
+            font-size: .62rem;
+            font-weight: 700;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.45);
+            margin: 0 0 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        /* Pulse dot next to label */
+        .insight-pulse {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: .8;
+            animation: dotPulse 2s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes dotPulse {
+            0%,100% { transform: scale(1);   opacity: .8; }
+            50%      { transform: scale(1.5); opacity: .4; }
+        }
+
+        .insight-emoji {
+            font-size: 1.1rem;
+            line-height: 1;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .insight-message {
+            font-size: .76rem;
+            font-weight: 500;
+            color: rgba(255,255,255,.88);
+            line-height: 1.45;
+            margin: 0;
+        }
+
+        .insight-streak {
+            margin-top: 7px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .68rem;
+            font-weight: 600;
+            color: rgba(255,255,255,.55);
+        }
+        .streak-fire { animation: pulse 1.5s infinite; display: inline-block; }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
 
         /* ── Main Content ───────────────────────────── */
         #main-content {
@@ -79,20 +202,12 @@
             display: inline-flex; align-items: center; gap: .4rem;
             padding: .35rem .75rem;
             font-size: .8rem; font-weight: 600;
-            color: #6b7280;
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all .15s ease;
-            text-decoration: none;
-            line-height: 1;
+            color: #6b7280; background: #fff;
+            border: 1px solid #e5e7eb; border-radius: 8px;
+            cursor: pointer; transition: all .15s ease;
+            text-decoration: none; line-height: 1;
         }
-        .topbar-logout-btn:hover {
-            color: #ef4444;
-            background: #fef2f2;
-            border-color: #fecaca;
-        }
+        .topbar-logout-btn:hover { color:#ef4444; background:#fef2f2; border-color:#fecaca; }
         .topbar-logout-btn i { font-size: .9rem; }
 
         /* ── Cards ──────────────────────────────────── */
@@ -124,8 +239,6 @@
         .flip-card-back { transform: rotateY(180deg); position:absolute; top:0; left:0; width:100%; }
 
         /* ── Misc ───────────────────────────────────── */
-        .streak-flame { font-size:1.5rem; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
         .nav-section-label {
             padding: .4rem 1.5rem; font-size:.7rem; font-weight:600;
             text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.35);
@@ -144,72 +257,108 @@
 
 {{-- ── SIDEBAR ──────────────────────────────────────────────── --}}
 <div id="sidebar">
+
+    {{-- Brand — pinned, never scrolls --}}
     <a class="sidebar-brand" href="{{ route('dashboard') }}">
         🎓 SmarTasker
         <span class="badge-lvl">Lv.{{ auth()->user()->level }}</span>
     </a>
 
-    <nav class="mt-1">
-        <div class="nav-section-label">Main</div>
-        <a href="{{ route('dashboard') }}"         class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <i class="bi bi-grid-1x2-fill"></i> Dashboard
-        </a>
-        <a href="{{ route('tasks.index') }}"       class="{{ request()->routeIs('tasks.*') ? 'active' : '' }}">
-            <i class="bi bi-check2-square"></i> Study Planner
-        </a>
-        <a href="{{ route('pomodoro.index') }}"    class="{{ request()->routeIs('pomodoro.*') ? 'active' : '' }}">
-            <i class="bi bi-stopwatch-fill"></i> Pomodoro
-        </a>
+    {{-- Scrollable nav zone --}}
+    <div class="sidebar-scroll">
+        <nav class="mt-1">
+            <div class="nav-section-label">Main</div>
+            <a href="{{ route('dashboard') }}"         class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
+            <a href="{{ route('tasks.index') }}"       class="{{ request()->routeIs('tasks.*') ? 'active' : '' }}">
+                <i class="bi bi-check2-square"></i> Study Planner
+            </a>
+            <a href="{{ route('pomodoro.index') }}"    class="{{ request()->routeIs('pomodoro.*') ? 'active' : '' }}">
+                <i class="bi bi-stopwatch-fill"></i> Pomodoro
+            </a>
+            <a href="{{ route('statistics.index') }}"  class="{{ request()->routeIs('statistics.*') ? 'active' : '' }}">
+                <i class="bi bi-graph-up-arrow"></i> Statistiques
+            </a>
 
-        <div class="nav-section-label">Learning</div>
-        <a href="{{ route('notes.index') }}"       class="{{ request()->routeIs('notes.*') ? 'active' : '' }}">
-            <i class="bi bi-journal-text"></i> Notes
-        </a>
-        <a href="{{ route('flashcards.index') }}"  class="{{ request()->routeIs('flashcards.*') ? 'active' : '' }}">
-            <i class="bi bi-layers-fill"></i> Flashcards
-        </a>
-        <a href="{{ route('exams.index') }}"       class="{{ request()->routeIs('exams.*') ? 'active' : '' }}">
-            <i class="bi bi-calendar-event-fill"></i> Exams
-        </a>
+            <div class="nav-section-label">Learning</div>
+            <a href="{{ route('notes.index') }}"       class="{{ request()->routeIs('notes.*') ? 'active' : '' }}">
+                <i class="bi bi-journal-text"></i> Notes
+            </a>
+            <a href="{{ route('flashcards.index') }}"  class="{{ request()->routeIs('flashcards.*') ? 'active' : '' }}">
+                <i class="bi bi-layers-fill"></i> Flashcards
+            </a>
+            <a href="{{ route('exams.index') }}"       class="{{ request()->routeIs('exams.*') ? 'active' : '' }}">
+                <i class="bi bi-calendar-event-fill"></i> Exams
+            </a>
 
-        <div class="nav-section-label">Settings</div>
-        <a href="{{ route('subjects.index') }}"    class="{{ request()->routeIs('subjects.*') ? 'active' : '' }}">
-            <i class="bi bi-book-fill"></i> Subjects
-        </a>
-        <a href="/profile" class="{{ request()->is('profile') ? 'active' : '' }}">
-            <i class="bi bi-person-circle"></i> Profile
-        </a>
-    </nav>
+            <div class="nav-section-label">Settings</div>
+            <a href="{{ route('subjects.index') }}"    class="{{ request()->routeIs('subjects.*') ? 'active' : '' }}">
+                <i class="bi bi-book-fill"></i> Subjects
+            </a>
+            <a href="/profile" class="{{ request()->is('profile') ? 'active' : '' }}">
+                <i class="bi bi-person-circle"></i> Profile
+            </a>
+        </nav>
+    </div>{{-- /sidebar-scroll --}}
 
-    {{-- XP / Level progress --}}
+    {{-- ── Footer — pinned at bottom ──────────────────────── --}}
     <div class="sidebar-footer">
         @php $user = auth()->user(); @endphp
-        <div class="d-flex justify-content-between align-items-center mb-1">
-            <small class="text-white-50" style="font-size:.75rem">
+
+        {{-- XP progress strip --}}
+        <div class="xp-strip">
+            <small class="text-white-50" style="font-size:.72rem">
                 <i class="bi bi-star-fill text-warning"></i>
                 {{ number_format($user->xp) }} XP
             </small>
-            <small class="text-white-50" style="font-size:.75rem">→ Lv.{{ $user->level + 1 }}</small>
+            <small class="text-white-50" style="font-size:.72rem">→ Lv.{{ $user->level + 1 }}</small>
         </div>
         <div class="xp-bar">
             <div class="xp-bar-fill" style="width:{{ $user->xpProgress() }}%"></div>
         </div>
-        @php $streak = $user->streak; @endphp
-        @if($streak && $streak->current_streak > 0)
-        <div class="mt-2 text-center" style="font-size:.8rem; color:rgba(255,255,255,.6)">
-            <span class="streak-flame">🔥</span>
-            {{ $streak->current_streak }}-day streak
-        </div>
-        @endif
 
-        <form method="POST" action="{{ route('logout') }}" class="mt-3">
-            @csrf
-            <button class="btn btn-sm w-100" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.7)">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
-        </form>
+        {{-- ── Smart Insight Widget ──────────────────────── --}}
+        {{--
+            $smartInsight is passed by DashboardController.
+            On non-dashboard pages it won't be set, so we fall back to a
+            safe default so the layout never throws an undefined-variable error.
+        --}}
+        @php
+            $insight      = $smartInsight ?? ['emoji' => '💡', 'message' => 'Keep studying — every session counts.', 'tone' => 'neutral'];
+            $insightTone  = $insight['tone'] ?? 'neutral';
+            $insightEmoji = $insight['emoji'] ?? '💡';
+            $insightMsg   = $insight['message'] ?? '';
+            $streak       = $user->streak;
+            $streakCount  = $streak->current_streak ?? 0;
+        @endphp
+
+        <div class="insight-widget tone-{{ $insightTone }}">
+            {{-- Header label with animated pulse dot --}}
+            <p class="insight-label">
+                <span class="insight-pulse"></span>
+                Smart Insight
+            </p>
+
+            {{-- Emoji + message --}}
+            <span class="insight-emoji">{{ $insightEmoji }}</span>
+            <p class="insight-message">{{ $insightMsg }}</p>
+
+            {{-- Streak footer — only shown when streak > 0 --}}
+            @if($streakCount > 0)
+            <div class="insight-streak">
+                <span class="streak-fire">🔥</span>
+                {{ $streakCount }}-day streak
+            </div>
+            @endif
+        </div>
+        {{-- /Smart Insight Widget --}}
+
     </div>
+    {{-- /sidebar-footer --}}
+
 </div>
+{{-- /sidebar --}}
 
 {{-- ── MAIN CONTENT ──────────────────────────────────────────── --}}
 <div id="main-content">
@@ -222,7 +371,7 @@
             <h6 class="mb-0 fw-600 text-muted">@yield('page-title', 'Dashboard')</h6>
         </div>
 
-        {{-- ✅ RIGHT SIDE: XP badge + user name + logout button --}}
+        {{-- RIGHT SIDE: XP badge + user name + logout button (only logout kept here) --}}
         <div class="d-flex align-items-center gap-2">
             <span class="badge text-bg-warning fw-semibold">
                 <i class="bi bi-star-fill"></i> {{ number_format(auth()->user()->xp) }} XP
@@ -231,7 +380,7 @@
                 {{ auth()->user()->name }}
             </span>
 
-            {{-- Logout button — POST to /logout --}}
+            {{-- ✅ Single logout button — lives ONLY here in the topbar --}}
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="topbar-logout-btn">
@@ -279,11 +428,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 
 <script>
-    // Mobile sidebar toggle
     document.getElementById('sidebarToggle')?.addEventListener('click', () => {
         document.getElementById('sidebar').classList.toggle('show');
     });
-    // Auto-dismiss alerts after 4 seconds
     setTimeout(() => {
         document.querySelectorAll('.alert').forEach(el => {
             bootstrap.Alert.getOrCreateInstance(el)?.close();
