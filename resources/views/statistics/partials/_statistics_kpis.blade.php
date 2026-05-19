@@ -1,52 +1,68 @@
 {{-- resources/views/statistics/partials/_statistics_kpis.blade.php --}}
-<div class="stats-kpis">
+<div class="st-kpi-grid">
 
-    <div class="kpi-card accent">
-        <span class="kpi-icon">✅</span>
-        <div class="kpi-value">{{ $taskStats['completed'] }}</div>
-        <div class="kpi-label">Tasks Completed</div>
+    <div class="st-kpi c-indigo">
+        <div class="st-kpi-top"></div>
+        <div class="st-kpi-icon"><i class="bi bi-list-check"></i></div>
+        <div class="st-kpi-label">Total Tasks</div>
+        <div class="st-kpi-value">{{ $taskStats['total'] }}</div>
+        <div class="st-kpi-sub">{{ $taskStats['in_progress'] }} in progress</div>
     </div>
 
-    <div class="kpi-card positive">
-        <span class="kpi-icon">⏱️</span>
-        <div class="kpi-value">{{ number_format($studyStats['total_study_minutes'] / 60, 1) }}<small style="font-size:1rem">h</small></div>
-        <div class="kpi-label">Total Study Time</div>
+    <div class="st-kpi c-emerald">
+        <div class="st-kpi-top"></div>
+        <div class="st-kpi-icon"><i class="bi bi-check2-all"></i></div>
+        <div class="st-kpi-label">Completed</div>
+        <div class="st-kpi-value">{{ $taskStats['completed'] }}</div>
+        <div class="st-kpi-sub">{{ $taskStats['completion_rate'] }}% rate</div>
     </div>
 
-    <div class="kpi-card accent">
-        <span class="kpi-icon">⚡</span>
-        <div class="kpi-value">{{ number_format($studyStats['total_xp']) }}</div>
-        <div class="kpi-label">Total XP Earned</div>
+    <div class="st-kpi c-sky">
+        <div class="st-kpi-top"></div>
+        <div class="st-kpi-icon"><i class="bi bi-stopwatch-fill"></i></div>
+        <div class="st-kpi-label">Focus Time</div>
+        <div class="st-kpi-value">{{ number_format($studyStats['total_study_minutes'] / 60, 1) }}<small>h</small></div>
+        <div class="st-kpi-sub">{{ $studyStats['total_sessions'] }} sessions total</div>
     </div>
 
-    <div class="kpi-card positive">
-        <span class="kpi-icon">🎯</span>
-        <div class="kpi-value">{{ $taskStats['completion_rate'] }}<small style="font-size:1rem">%</small></div>
-        <div class="kpi-label">Completion Rate</div>
+    <div class="st-kpi c-amber">
+        <div class="st-kpi-top"></div>
+        <div class="st-kpi-icon"><i class="bi bi-lightning-fill"></i></div>
+        <div class="st-kpi-label">XP This Week</div>
+        <div class="st-kpi-value">{{ $studyStats['weekly_xp'] }}</div>
+        <div class="st-kpi-sub">{{ number_format($studyStats['total_xp']) }} total XP</div>
     </div>
 
-    <div class="kpi-card warning">
-        <span class="kpi-icon">🔥</span>
-        <div class="kpi-value">{{ $trends['streak'] }}</div>
-        <div class="kpi-label">Day Streak</div>
+    <div class="st-kpi c-violet">
+        <div class="st-kpi-top"></div>
+        <div class="st-kpi-icon"><i class="bi bi-fire"></i></div>
+        <div class="st-kpi-label">Day Streak</div>
+        <div class="st-kpi-value">{{ $trends['streak'] }}</div>
+        <div class="st-kpi-sub">days in a row</div>
     </div>
 
-    <div class="kpi-card {{ $taskStats['overdue'] > 0 ? 'danger' : 'positive' }}">
-        <span class="kpi-icon">⚠️</span>
-        <div class="kpi-value">{{ $taskStats['overdue'] }}</div>
-        <div class="kpi-label">Overdue Tasks</div>
+    <div class="st-kpi c-indigo">
+        <div class="st-kpi-top"></div>
+        <div class="st-kpi-icon"><i class="bi bi-alarm-fill"></i></div>
+        <div class="st-kpi-label">Focus Sessions</div>
+        <div class="st-kpi-value">{{ $studyStats['total_sessions'] }}</div>
+        <div class="st-kpi-sub">avg {{ $studyStats['avg_session_minutes'] }} min each</div>
     </div>
 
-    <div class="kpi-card accent">
-        <span class="kpi-icon">🍅</span>
-        <div class="kpi-value">{{ $studyStats['total_sessions'] }}</div>
-        <div class="kpi-label">Focus Sessions</div>
+    <div class="st-kpi c-emerald">
+        <div class="st-kpi-top"></div>
+        <div class="st-kpi-icon"><i class="bi bi-graph-up-arrow"></i></div>
+        <div class="st-kpi-label">Avg Session</div>
+        <div class="st-kpi-value">{{ $studyStats['avg_session_minutes'] }}<small>m</small></div>
+        <div class="st-kpi-sub">per Pomodoro</div>
     </div>
 
-    <div class="kpi-card positive">
-        <span class="kpi-icon">📚</span>
-        <div class="kpi-value">{{ count($subjectDist['labels']) }}</div>
-        <div class="kpi-label">Active Subjects</div>
+    <div class="st-kpi {{ $taskStats['overdue'] > 0 ? 'c-rose' : 'c-emerald' }}">
+        <div class="st-kpi-top"></div>
+        <div class="st-kpi-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+        <div class="st-kpi-label">Overdue</div>
+        <div class="st-kpi-value">{{ $taskStats['overdue'] }}</div>
+        <div class="st-kpi-sub">{{ $taskStats['overdue_rate'] }}% of total</div>
     </div>
 
 </div>

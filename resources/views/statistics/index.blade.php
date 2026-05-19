@@ -1,44 +1,47 @@
 {{-- resources/views/statistics/index.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Statistics — Smart Tasks Planner')
+@section('title', 'Statistics — SmarTasker')
+@section('page-title', '📊 Statistics')
+
+@push('styles')
+    @include('statistics.partials._statistics_styles')
+@endpush
 
 @section('content')
+<div class="st-page">
 
-@include('statistics.partials._statistics_styles')
-
-<div class="stats-page">
-
-    {{-- Header --}}
+    {{-- ── HEADER ──────────────────────────────────────────────────────── --}}
     @include('statistics.partials._statistics_header')
 
-    {{-- KPI Row --}}
+    {{-- ── KPI ROW ──────────────────────────────────────────────────────── --}}
     @include('statistics.partials._statistics_kpis')
 
-    {{-- Heatmap --}}
-    @include('statistics.partials._heatmap')
-
-    {{-- Weekly Comparison --}}
+    {{-- ── WEEKLY COMPARISON ───────────────────────────────────────────── --}}
     @include('statistics.partials._weekly_comparison')
 
-    <div class="stats-grid-2">
+    {{-- ── HEATMAP ──────────────────────────────────────────────────────── --}}
+    @include('statistics.partials._heatmap')
 
-        {{-- Subject Analytics --}}
-        @include('statistics.partials._subject_analytics')
-
-        {{-- Focus Analytics --}}
-        @include('statistics.partials._focus_analytics')
-
+    {{-- ── SUBJECT + FOCUS (2-col) ──────────────────────────────────────── --}}
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-6">
+            @include('statistics.partials._subject_analytics')
+        </div>
+        <div class="col-12 col-lg-6">
+            @include('statistics.partials._focus_analytics')
+        </div>
     </div>
 
-    {{-- Trend Charts --}}
+    {{-- ── TREND CHARTS + XP CUMULATIVE ───────────────────────────────── --}}
     @include('statistics.partials._trend_charts')
 
-    {{-- Insights --}}
+    {{-- ── INSIGHTS ─────────────────────────────────────────────────────── --}}
     @include('statistics.partials._insights')
 
 </div>
-
-@include('statistics.partials._statistics_scripts')
-
 @endsection
+
+@push('scripts')
+    @include('statistics.partials._statistics_scripts')
+@endpush

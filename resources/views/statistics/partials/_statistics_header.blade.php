@@ -1,17 +1,15 @@
 {{-- resources/views/statistics/partials/_statistics_header.blade.php --}}
-<div class="stats-header">
+<div class="st-header d-flex align-items-center justify-content-between flex-wrap gap-3">
     <div>
-        <div class="stats-section-label">Analytics Center</div>
-        <h1 class="stats-header-title">Statistics</h1>
-        <p class="stats-header-sub">Deep productivity intelligence for {{ Auth::user()->name }}</p>
+        <div class="st-header-eyebrow">
+            <i class="bi bi-graph-up-arrow"></i>
+            Analytics Center
+        </div>
+        <h1 class="st-header-title mb-0">Statistics</h1>
+        <p class="st-header-sub mt-1">Deep productivity intelligence for <strong style="color:rgba(255,255,255,.9)">{{ Auth::user()->name }}</strong></p>
     </div>
-    <nav class="stats-header-nav">
-        <a href="{{ route('dashboard') }}">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
-                <path d="M9 21V12h6v9"/>
-            </svg>
-            Dashboard
-        </a>
-    </nav>
+    <a href="{{ route('dashboard') }}" class="st-header-back">
+        <i class="bi bi-grid-1x2-fill"></i>
+        Dashboard
+    </a>
 </div>
