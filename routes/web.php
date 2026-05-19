@@ -9,7 +9,7 @@ use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PomodoroController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\ExamController;
-use App\Http\Controllers\StatisticsController;   // ← NEW
+use App\Http\Controllers\StatisticsController;
 
 // ── Public redirect ───────────────────────────────────────────
 Route::get('/', fn() => redirect()->route('dashboard'));
@@ -18,7 +18,7 @@ Route::get('/', fn() => redirect()->route('dashboard'));
 require __DIR__ . '/auth.php';
 
 // ── Protected routes ──────────────────────────────────────────
-Route::middleware(['auth', 'email.verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -46,17 +46,7 @@ Route::middleware(['auth', 'email.verified'])->group(function () {
     // Exams
     Route::resource('exams', ExamController::class)->except(['show', 'create']);
 
-    // ── Statistics ────────────────────────────────────────────── NEW
-    Route::prefix('statistics')->name('statistics.')->controller(StatisticsController::class)->group(function () {
-        Route::get('/',                  'index')           ->name('index');
-        Route::get('/tasks',             'tasks')           ->name('tasks');
-        Route::get('/study-time',        'studyTime')       ->name('study-time');
-        Route::get('/xp',                'xp')              ->name('xp');
-        Route::get('/streaks',           'streaks')         ->name('streaks');
-        Route::get('/subjects',          'subjects')        ->name('subjects');
-        Route::get('/heatmap',           'heatmap')         ->name('heatmap');
-        Route::get('/weekly-comparison', 'weeklyComparison')->name('weekly-comparison');
-        Route::get('/pomodoro',          'pomodoro')        ->name('pomodoro');
-    });
+    // ── Statistics ────────────────────────────────────────────
+    Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 
 });

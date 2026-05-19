@@ -14,9 +14,6 @@ class ProductivityService
     // 1. TASK STATISTICS
     // -------------------------------------------------------------------------
 
-    /**
-     * Returns a complete snapshot of the user's task metrics.
-     */
     public function getTaskStatistics(mixed $user): array
     {
         $counts = Task::query()
@@ -55,9 +52,6 @@ class ProductivityService
     // 2. STUDY / POMODORO STATISTICS
     // -------------------------------------------------------------------------
 
-    /**
-     * Returns study-time and XP aggregates for the current week and all-time.
-     */
     public function getStudyStatistics(mixed $user): array
     {
         $weekStart = Carbon::now()->startOfWeek();
@@ -94,14 +88,9 @@ class ProductivityService
     }
 
     // -------------------------------------------------------------------------
-    // 3. WEEKLY TASKS CHART  (last 7 days, Chart.js-ready)
+    // 3. WEEKLY TASKS CHART
     // -------------------------------------------------------------------------
 
-    /**
-     * Returns completed-tasks count for each of the last 7 days.
-     *
-     * @return array{labels: string[], data: int[]}
-     */
     public function getWeeklyTasksChart(mixed $user): array
     {
         $days = collect(range(6, 0))->map(fn ($i) => Carbon::today()->subDays($i));
@@ -127,14 +116,9 @@ class ProductivityService
     }
 
     // -------------------------------------------------------------------------
-    // 4. XP PROGRESS CHART  (last 30 days, cumulative, Chart.js-ready)
+    // 4. XP PROGRESS CHART
     // -------------------------------------------------------------------------
 
-    /**
-     * Returns cumulative XP earned per day over the last 30 days.
-     *
-     * @return array{labels: string[], data: int[]}
-     */
     public function getXpProgressChart(mixed $user): array
     {
         $days = collect(range(29, 0))->map(fn ($i) => Carbon::today()->subDays($i));
@@ -163,14 +147,9 @@ class ProductivityService
     }
 
     // -------------------------------------------------------------------------
-    // 5. HEATMAP DATA  (last 365 days, GitHub-style)
+    // 5. HEATMAP DATA (legacy — kept for dashboard)
     // -------------------------------------------------------------------------
 
-    /**
-     * Returns daily activity counts for the last 365 days.
-     *
-     * @return array<string, int>
-     */
     public function getHeatmapData(mixed $user): array
     {
         $from = Carbon::today()->subDays(364)->startOfDay();
@@ -191,9 +170,6 @@ class ProductivityService
     // 6. WEEKLY COMPARISON
     // -------------------------------------------------------------------------
 
-    /**
-     * Compares current week vs previous week for key metrics.
-     */
     public function getWeeklyComparison(mixed $user): array
     {
         $thisStart = Carbon::now()->startOfWeek();
@@ -233,12 +209,6 @@ class ProductivityService
     // 7. SUBJECT PRODUCTIVITY
     // -------------------------------------------------------------------------
 
-    /**
-     * Returns per-subject breakdown: completed tasks + study minutes.
-     * Ready for Chart.js radar / bar chart.
-     *
-     * @return array{labels: string[], tasks: int[], minutes: int[]}
-     */
     public function getSubjectProductivity(mixed $user): array
     {
         $tasksBySubject = Task::query()
@@ -273,41 +243,16 @@ class ProductivityService
     }
 
     // -------------------------------------------------------------------------
-    // 8. SUBJECT DISTRIBUTION  ← NEW METHOD (fixes the undefined variable error)
+    // 8. SUBJECT DISTRIBUTION
     // -------------------------------------------------------------------------
 
-    /**
-     * Returns task distribution by subject — Chart.js donut-ready.
-     *
-     * Single JOIN query, no N+1. Ordered by task count DESC so the first
-     * entry is always the most active subject (used for the 🏆 badge).
-     *
-     * @return array{
-     *   labels:      string[],
-     *   data:        int[],
-     *   percentages: float[],
-     *   colors:      string[],
-     *   top_subject: string|null,
-     *   total:       int
-     * }
-     */
     public function getSubjectDistribution(mixed $user): array
     {
-        // 10-color SaaS palette — cycles for users with more than 10 subjects
         $palette = [
-            '#6366f1', // indigo
-            '#10b981', // emerald
-            '#f59e0b', // amber
-            '#0ea5e9', // sky
-            '#f43f5e', // rose
-            '#8b5cf6', // violet
-            '#06b6d4', // cyan
-            '#84cc16', // lime
-            '#fb923c', // orange
-            '#ec4899', // pink
+            '#6366f1','#10b981','#f59e0b','#0ea5e9','#f43f5e',
+            '#8b5cf6','#06b6d4','#84cc16','#fb923c','#ec4899',
         ];
 
-        // Single query: count ALL tasks per subject (any status) for this user
         $rows = Task::query()
             ->where('tasks.user_id', $user->id)
             ->whereNotNull('tasks.subject_id')
@@ -317,52 +262,381 @@ class ProductivityService
             ->orderByDesc('total')
             ->get();
 
-        // Return a safe empty structure when the user has no subject-linked tasks
         if ($rows->isEmpty()) {
-            return [
-                'labels'      => [],
-                'data'        => [],
-                'percentages' => [],
-                'colors'      => [],
-                'top_subject' => null,
-                'total'       => 0,
-            ];
+            return ['labels'=>[],'data'=>[],'percentages'=>[],'colors'=>[],'top_subject'=>null,'total'=>0];
         }
 
         $grandTotal  = $rows->sum('total');
-        $labels      = [];
-        $data        = [];
-        $percentages = [];
-        $colors      = [];
+        $labels = $data = $percentages = $colors = [];
 
         foreach ($rows as $i => $row) {
             $labels[]      = $row->subject_name;
             $data[]        = (int) $row->total;
-            $percentages[] = $grandTotal > 0
-                ? round(($row->total / $grandTotal) * 100, 1)
-                : 0.0;
+            $percentages[] = $grandTotal > 0 ? round(($row->total / $grandTotal) * 100, 1) : 0.0;
             $colors[]      = $palette[$i % count($palette)];
         }
 
-        return [
-            'labels'      => $labels,
-            'data'        => $data,
-            'percentages' => $percentages,
-            'colors'      => $colors,
-            'top_subject' => $labels[0] ?? null,  // highest count (ORDER BY DESC)
+        return compact('labels','data','percentages','colors','grandTotal') + [
+            'top_subject' => $labels[0] ?? null,
             'total'       => (int) $grandTotal,
         ];
     }
 
+    // =========================================================================
+    // NEW STATISTICS MODULE METHODS
+    // =========================================================================
+
     // -------------------------------------------------------------------------
-    // PRIVATE HELPERS
+    // A. PRODUCTIVITY HEATMAP — GitHub-style, last 365 days
     // -------------------------------------------------------------------------
 
     /**
-     * Builds a delta comparison array between two integer values.
+     * Returns daily activity data for a GitHub-style heatmap.
+     * Combines completed tasks + focus sessions per day.
      *
-     * @return array{current: int, previous: int, delta: float}
+     * @return array{dates: array<string, int>, max: int, weeks: array}
      */
+    public function getProductivityHeatmap(mixed $user): array
+    {
+        $from = Carbon::today()->subDays(364)->startOfDay();
+
+        // Focus sessions per day
+        $sessions = PomodoroSession::query()
+            ->where('user_id', $user->id)
+            ->where('type', 'focus')
+            ->where('completed', true)
+            ->where('created_at', '>=', $from)
+            ->selectRaw("DATE(created_at) AS day, COUNT(*) AS cnt")
+            ->groupByRaw("DATE(created_at)")
+            ->pluck('cnt', 'day');
+
+        // Completed tasks per day
+        $tasks = Task::query()
+            ->where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->where('updated_at', '>=', $from)
+            ->selectRaw("DATE(updated_at) AS day, COUNT(*) AS cnt")
+            ->groupByRaw("DATE(updated_at)")
+            ->pluck('cnt', 'day');
+
+        // Merge both counts
+        $dates = [];
+        $allKeys = collect($sessions->keys())->merge($tasks->keys())->unique();
+        foreach ($allKeys as $day) {
+            $dates[$day] = (int)($sessions[$day] ?? 0) + (int)($tasks[$day] ?? 0);
+        }
+
+        $max = empty($dates) ? 1 : max($dates);
+
+        // Build weeks array for the grid renderer
+        $weeks   = [];
+        $current = Carbon::parse($from)->startOfWeek(Carbon::SUNDAY);
+        $today   = Carbon::today();
+
+        while ($current->lte($today)) {
+            $week = [];
+            for ($d = 0; $d < 7; $d++) {
+                $dateStr = $current->toDateString();
+                $week[]  = [
+                    'date'  => $dateStr,
+                    'count' => $dates[$dateStr] ?? 0,
+                    'level' => $this->heatLevel($dates[$dateStr] ?? 0, $max),
+                    'future'=> $current->gt($today),
+                ];
+                $current->addDay();
+            }
+            $weeks[] = $week;
+        }
+
+        return compact('dates', 'max', 'weeks');
+    }
+
+    // -------------------------------------------------------------------------
+    // B. DETAILED SUBJECT ANALYTICS
+    // -------------------------------------------------------------------------
+
+    public function getDetailedSubjectAnalytics(mixed $user): array
+    {
+        // Completed vs total tasks per subject
+        $taskRows = Task::query()
+            ->where('tasks.user_id', $user->id)
+            ->whereNotNull('tasks.subject_id')
+            ->join('subjects', 'subjects.id', '=', 'tasks.subject_id')
+            ->selectRaw("
+                subjects.id AS subject_id,
+                subjects.name AS subject_name,
+                COUNT(*) AS total_tasks,
+                SUM(tasks.status = 'completed') AS completed_tasks
+            ")
+            ->groupBy('subjects.id', 'subjects.name')
+            ->get();
+
+        // Study minutes per subject
+        $minuteRows = PomodoroSession::query()
+            ->where('pomodoro_sessions.user_id', $user->id)
+            ->where('pomodoro_sessions.type', 'focus')
+            ->where('pomodoro_sessions.completed', true)
+            ->whereNotNull('pomodoro_sessions.subject_id')
+            ->join('subjects', 'subjects.id', '=', 'pomodoro_sessions.subject_id')
+            ->selectRaw("subjects.id AS subject_id, SUM(pomodoro_sessions.duration) AS study_minutes")
+            ->groupBy('subjects.id')
+            ->pluck('study_minutes', 'subject_id');
+
+        if ($taskRows->isEmpty()) {
+            return [
+                'subjects'        => [],
+                'strongest'       => null,
+                'weakest'         => null,
+                'chart_labels'    => [],
+                'chart_rates'     => [],
+                'chart_minutes'   => [],
+            ];
+        }
+
+        $subjects = $taskRows->map(function ($row) use ($minuteRows) {
+            $total     = (int) $row->total_tasks;
+            $completed = (int) $row->completed_tasks;
+            $rate      = $total > 0 ? round(($completed / $total) * 100, 1) : 0.0;
+            return [
+                'name'            => $row->subject_name,
+                'total_tasks'     => $total,
+                'completed_tasks' => $completed,
+                'completion_rate' => $rate,
+                'study_minutes'   => (int) ($minuteRows[$row->subject_id] ?? 0),
+            ];
+        })->values()->toArray();
+
+        // Strongest = highest completion rate (min 1 task)
+        $withTasks  = array_filter($subjects, fn ($s) => $s['total_tasks'] > 0);
+        $strongest  = !empty($withTasks)
+            ? array_reduce($withTasks, fn ($carry, $s) => ($carry === null || $s['completion_rate'] > $carry['completion_rate']) ? $s : $carry)
+            : null;
+        $weakest    = !empty($withTasks)
+            ? array_reduce($withTasks, fn ($carry, $s) => ($carry === null || $s['completion_rate'] < $carry['completion_rate']) ? $s : $carry)
+            : null;
+
+        return [
+            'subjects'      => $subjects,
+            'strongest'     => $strongest,
+            'weakest'       => $weakest,
+            'chart_labels'  => array_column($subjects, 'name'),
+            'chart_rates'   => array_column($subjects, 'completion_rate'),
+            'chart_minutes' => array_column($subjects, 'study_minutes'),
+        ];
+    }
+
+    // -------------------------------------------------------------------------
+    // C. FOCUS ANALYTICS
+    // -------------------------------------------------------------------------
+
+    public function getFocusAnalytics(mixed $user): array
+    {
+        $sessions = PomodoroSession::query()
+            ->where('user_id', $user->id)
+            ->where('type', 'focus')
+            ->where('completed', true)
+            ->selectRaw("
+                COUNT(*) AS total_sessions,
+                SUM(duration) AS total_minutes,
+                AVG(duration) AS avg_minutes,
+                HOUR(created_at) AS hour
+            ")
+            ->groupByRaw("HOUR(created_at)")
+            ->get();
+
+        $totalSessions = $sessions->sum('total_sessions');
+        $totalMinutes  = $sessions->sum('total_minutes');
+
+        // Best study hour = hour with most sessions
+        $bestHourRow   = $sessions->sortByDesc('total_sessions')->first();
+        $bestHour      = $bestHourRow ? (int)$bestHourRow->hour : null;
+        $bestHourLabel = $bestHour !== null
+            ? Carbon::createFromTime($bestHour)->format('g A') . ' – ' . Carbon::createFromTime(($bestHour + 1) % 24)->format('g A')
+            : 'N/A';
+
+        $avgSession = $totalSessions > 0 ? round($totalMinutes / $totalSessions, 1) : 0.0;
+
+        // Focus consistency: days with at least 1 session in last 30 days
+        $activeDays = PomodoroSession::query()
+            ->where('user_id', $user->id)
+            ->where('type', 'focus')
+            ->where('completed', true)
+            ->where('created_at', '>=', Carbon::today()->subDays(29))
+            ->selectRaw("DATE(created_at) AS day")
+            ->groupByRaw("DATE(created_at)")
+            ->count();
+
+        $consistency = round(($activeDays / 30) * 100, 1);
+
+        // Hourly distribution for chart
+        $hourlyLabels = [];
+        $hourlyData   = [];
+        $hourMap      = $sessions->keyBy('hour');
+        for ($h = 0; $h < 24; $h++) {
+            $hourlyLabels[] = Carbon::createFromTime($h)->format('g A');
+            $hourlyData[]   = (int) ($hourMap[$h]->total_sessions ?? 0);
+        }
+
+        return [
+            'total_sessions'   => (int) $totalSessions,
+            'total_minutes'    => (int) $totalMinutes,
+            'avg_session'      => $avgSession,
+            'best_hour'        => $bestHourLabel,
+            'consistency'      => $consistency,
+            'active_days'      => $activeDays,
+            'hourly_labels'    => $hourlyLabels,
+            'hourly_data'      => $hourlyData,
+        ];
+    }
+
+    // -------------------------------------------------------------------------
+    // D. PRODUCTIVITY TRENDS — monthly, last 6 months
+    // -------------------------------------------------------------------------
+
+    public function getProductivityTrends(mixed $user): array
+    {
+        $months = collect(range(5, 0))->map(fn ($i) => Carbon::now()->startOfMonth()->subMonths($i));
+
+        $labels          = [];
+        $tasksData       = [];
+        $minutesData     = [];
+        $xpData          = [];
+
+        foreach ($months as $month) {
+            $start = $month->copy()->startOfMonth();
+            $end   = $month->copy()->endOfMonth();
+
+            $labels[] = $month->format('M Y');
+
+            $tasksData[] = Task::where('user_id', $user->id)
+                ->where('status', 'completed')
+                ->whereBetween('updated_at', [$start, $end])
+                ->count();
+
+            $pomo = PomodoroSession::where('user_id', $user->id)
+                ->where('type', 'focus')
+                ->where('completed', true)
+                ->whereBetween('created_at', [$start, $end])
+                ->selectRaw('SUM(duration) AS minutes, SUM(xp_earned) AS xp')
+                ->first();
+
+            $minutesData[] = (int) ($pomo->minutes ?? 0);
+            $xpData[]      = (int) ($pomo->xp      ?? 0);
+        }
+
+        // Streak growth: count current streak
+        $streak = $this->calculateStreak($user);
+
+        return [
+            'labels'    => $labels,
+            'tasks'     => $tasksData,
+            'minutes'   => $minutesData,
+            'xp'        => $xpData,
+            'streak'    => $streak,
+        ];
+    }
+
+    // -------------------------------------------------------------------------
+    // E. LOCAL INSIGHTS (no AI)
+    // -------------------------------------------------------------------------
+
+    public function generateStatisticsInsights(mixed $user): array
+    {
+        $insights = [];
+
+        // --- Most productive day of week ---
+        $dayData = PomodoroSession::query()
+            ->where('user_id', $user->id)
+            ->where('type', 'focus')
+            ->where('completed', true)
+            ->selectRaw("DAYOFWEEK(created_at) AS dow, COUNT(*) AS cnt")
+            ->groupByRaw("DAYOFWEEK(created_at)")
+            ->orderByDesc('cnt')
+            ->first();
+
+        if ($dayData) {
+            $dayName    = Carbon::now()->startOfWeek()->addDays($dayData->dow - 2)->format('l');
+            $insights[] = [
+                'icon'    => '🗓️',
+                'type'    => 'pattern',
+                'message' => "You are most productive on {$dayName}s.",
+            ];
+        }
+
+        // --- Weekly consistency ---
+        $comparison = $this->getWeeklyComparison($user);
+        $sessionsDelta = $comparison['pomodoro_sessions']['delta'] ?? 0;
+        if ($sessionsDelta > 0) {
+            $insights[] = [
+                'icon'    => '📈',
+                'type'    => 'positive',
+                'message' => "Your focus sessions increased {$sessionsDelta}% compared to last week. Keep it up!",
+            ];
+        } elseif ($sessionsDelta < -10) {
+            $insights[] = [
+                'icon'    => '⚡',
+                'type'    => 'warning',
+                'message' => "Focus sessions dropped this week. Try scheduling a study block tomorrow.",
+            ];
+        }
+
+        // --- Strongest subject ---
+        $subjectAnalytics = $this->getDetailedSubjectAnalytics($user);
+        if (!empty($subjectAnalytics['strongest'])) {
+            $s          = $subjectAnalytics['strongest'];
+            $insights[] = [
+                'icon'    => '🏆',
+                'type'    => 'positive',
+                'message' => "{$s['name']} has your highest completion rate at {$s['completion_rate']}%.",
+            ];
+        }
+
+        // --- Weakest subject ---
+        if (!empty($subjectAnalytics['weakest']) && $subjectAnalytics['weakest']['completion_rate'] < 50) {
+            $w          = $subjectAnalytics['weakest'];
+            $insights[] = [
+                'icon'    => '📚',
+                'type'    => 'suggestion',
+                'message' => "{$w['name']} needs attention — only {$w['completion_rate']}% of tasks completed.",
+            ];
+        }
+
+        // --- Overdue tasks warning ---
+        $taskStats = $this->getTaskStatistics($user);
+        if ($taskStats['overdue'] > 0) {
+            $insights[] = [
+                'icon'    => '⚠️',
+                'type'    => 'warning',
+                'message' => "You have {$taskStats['overdue']} overdue task(s). Consider reviewing your deadlines.",
+            ];
+        }
+
+        // --- High completion rate celebration ---
+        if ($taskStats['completion_rate'] >= 80) {
+            $insights[] = [
+                'icon'    => '🎯',
+                'type'    => 'positive',
+                'message' => "Outstanding! Your overall task completion rate is {$taskStats['completion_rate']}%.",
+            ];
+        }
+
+        // --- Streak insight ---
+        $streak = $this->calculateStreak($user);
+        if ($streak >= 7) {
+            $insights[] = [
+                'icon'    => '🔥',
+                'type'    => 'positive',
+                'message' => "You're on a {$streak}-day study streak! Incredible consistency.",
+            ];
+        }
+
+        return $insights;
+    }
+
+    // =========================================================================
+    // PRIVATE HELPERS
+    // =========================================================================
+
     private function buildDelta(int $current, int $previous): array
     {
         $delta = $previous > 0
@@ -370,5 +644,44 @@ class ProductivityService
             : ($current > 0 ? 100.0 : 0.0);
 
         return compact('current', 'previous', 'delta');
+    }
+
+    private function heatLevel(int $count, int $max): int
+    {
+        if ($count === 0 || $max === 0) return 0;
+        $ratio = $count / $max;
+        return match (true) {
+            $ratio >= 0.75 => 4,
+            $ratio >= 0.50 => 3,
+            $ratio >= 0.25 => 2,
+            default        => 1,
+        };
+    }
+
+    private function calculateStreak(mixed $user): int
+    {
+        $dates = PomodoroSession::query()
+            ->where('user_id', $user->id)
+            ->where('type', 'focus')
+            ->where('completed', true)
+            ->selectRaw("DATE(created_at) AS day")
+            ->groupByRaw("DATE(created_at)")
+            ->orderByDesc('day')
+            ->pluck('day')
+            ->map(fn ($d) => Carbon::parse($d));
+
+        $streak  = 0;
+        $current = Carbon::today();
+
+        foreach ($dates as $date) {
+            if ($date->toDateString() === $current->toDateString()) {
+                $streak++;
+                $current->subDay();
+            } elseif ($date->lt($current)) {
+                break;
+            }
+        }
+
+        return $streak;
     }
 }
