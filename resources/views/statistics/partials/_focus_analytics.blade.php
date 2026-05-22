@@ -12,19 +12,19 @@
         {{-- 4-stat mini-grid --}}
         <div class="st-focus-grid">
             <div class="st-focus-stat">
-                <div class="st-focus-val">{{ $focusAnalytics['avg_session'] }}<small style="font-size:.75rem;font-weight:500;color:var(--st-muted)">m</small></div>
+                <div class="st-focus-val !text-xl !font-bold !leading-tight !text-slate-900">{{ $focusAnalytics['avg_session'] }}<small class="!text-xs !font-semibold !leading-none !text-slate-500">m</small></div>
                 <div class="st-focus-lbl">Avg Session</div>
             </div>
             <div class="st-focus-stat">
-                <div class="st-focus-val">{{ $focusAnalytics['best_hour'] }}</div>
+                <div class="st-focus-val !text-xl !font-bold !leading-tight !text-slate-900">{{ $focusAnalytics['best_hour'] }}</div>
                 <div class="st-focus-lbl">Peak Hour</div>
             </div>
             <div class="st-focus-stat">
-                <div class="st-focus-val">{{ $focusAnalytics['total_sessions'] }}</div>
+                <div class="st-focus-val !text-xl !font-bold !leading-tight !text-slate-900">{{ $focusAnalytics['total_sessions'] }}</div>
                 <div class="st-focus-lbl">Total Sessions</div>
             </div>
             <div class="st-focus-stat">
-                <div class="st-focus-val">{{ $focusAnalytics['consistency'] }}<small style="font-size:.75rem;font-weight:500;color:var(--st-muted)">%</small></div>
+                <div class="st-focus-val !text-xl !font-bold !leading-tight !text-slate-900">{{ $focusAnalytics['consistency'] }}<small class="!text-xs !font-semibold !leading-none !text-slate-500">%</small></div>
                 <div class="st-focus-lbl">Consistency</div>
             </div>
         </div>

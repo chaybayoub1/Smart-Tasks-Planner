@@ -29,10 +29,10 @@
                     <i class="bi {{ $m['icon'] }}" style="color:{{ $m['color'] }}"></i>
                     {{ $m['label'] }}
                 </div>
-                <div>
-                    <span class="st-compare-val">{{ number_format($d['current']) }}</span>
+                <div class="st-compare-val kpi-value">
+                    {{ number_format($d['current']) }}
                     @if($m['unit'])
-                        <span class="st-compare-unit">{{ $m['unit'] }}</span>
+                        <small>{{ $m['unit'] }}</small>
                     @endif
                 </div>
                 <div class="st-compare-prev">vs {{ number_format($d['previous']) }}{{ $m['unit'] ? ' '.$m['unit'] : '' }} last week</div>

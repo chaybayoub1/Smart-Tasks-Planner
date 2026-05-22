@@ -38,6 +38,9 @@
 }
 
 .kpi-card {
+    --kpi-text: var(--db-text);
+    --kpi-muted: var(--db-muted);
+    --kpi-sub-muted: var(--db-muted);
     position: relative;
     background: var(--db-surface);
     border: 1px solid var(--db-border);
@@ -74,27 +77,7 @@
 }
 
 .kpi-body { flex: 1; min-width: 0; }
-.kpi-label {
-    font-size: .72rem;
-    font-weight: 600;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: var(--db-muted);
-    margin: 0 0 4px;
-}
-.kpi-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--db-text);
-    margin: 0;
-    line-height: 1;
-    letter-spacing: -.02em;
-}
-.kpi-sub {
-    font-size: .72rem;
-    color: var(--db-muted);
-    margin: 4px 0 0;
-}
+@include('partials._kpi_typography_styles')
 
 .kpi-trend {
     font-size: .7rem;

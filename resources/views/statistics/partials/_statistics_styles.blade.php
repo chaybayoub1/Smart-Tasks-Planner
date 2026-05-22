@@ -149,6 +149,9 @@
 @media (max-width: 576px)  { .st-kpi-grid { grid-template-columns: 1fr 1fr; } }
 
 .st-kpi {
+    --kpi-text: var(--st-text);
+    --kpi-muted: var(--st-muted);
+    --kpi-sub-muted: var(--st-muted-light);
     background: var(--st-surface);
     border: 1px solid var(--st-border);
     border-radius: var(--st-radius);
@@ -176,33 +179,7 @@
     margin-bottom: .75rem;
     flex-shrink: 0;
 }
-.st-kpi-value {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--st-text);
-    line-height: 1;
-    letter-spacing: -.03em;
-    margin-bottom: .25rem;
-}
-.st-kpi-value small {
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0;
-}
-.st-kpi-label {
-    font-size: .72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--st-muted);
-    margin-bottom: 0;
-}
-.st-kpi-sub {
-    font-size: .72rem;
-    color: var(--st-muted-light);
-    margin-top: 3px;
-}
+@include('partials._kpi_typography_styles')
 
 /* ── KPI colour variants ── */
 .st-kpi.c-indigo .st-kpi-top   { background: var(--st-indigo); }
@@ -300,6 +277,9 @@
 @media (max-width: 480px) { .st-compare-grid { grid-template-columns: 1fr; } }
 
 .st-compare-item {
+    --kpi-text: var(--st-text);
+    --kpi-muted: var(--st-muted);
+    --kpi-sub-muted: var(--st-muted-light);
     background: var(--st-surface-2);
     border: 1px solid var(--st-border);
     border-radius: var(--st-radius-sm);
@@ -318,21 +298,6 @@
     display: flex;
     align-items: center;
     gap: 6px;
-}
-.st-compare-val {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.65rem;
-    font-weight: 800;
-    color: var(--st-text);
-    line-height: 1;
-    letter-spacing: -.03em;
-}
-.st-compare-unit {
-    font-size: .8rem;
-    font-weight: 500;
-    color: var(--st-muted);
-    letter-spacing: 0;
-    margin-left: 2px;
 }
 .st-compare-prev {
     font-size: .75rem;
@@ -581,8 +546,6 @@
 @media (max-width: 576px) {
     .st-header { padding: 1.5rem; }
     .st-header-title { font-size: 1.5rem; }
-    .st-kpi-value { font-size: 1.5rem; }
-    .st-compare-val { font-size: 1.35rem; }
 }
 </style>
 
