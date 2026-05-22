@@ -4,146 +4,124 @@
 @section('page-title', 'Flashcards')
 
 @section('content')
-<div class="row g-4">
 
-    {{-- ── HEADER ROW ────────────────────────────────────────── --}}
-    <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2">
-        <div>
-            <h5 class="fw-700 mb-0">My Flashcards</h5>
-            <small class="text-muted">{{ $flashcards->total() }} cards total</small>
-        </div>
-        <div class="d-flex gap-2">
-            @if($dueCount > 0)
-            <a href="{{ route('flashcards.review') }}"
-               class="btn btn-success fw-600">
-                <i class="bi bi-play-fill me-1"></i>
-                Review {{ $dueCount }} Due Card{{ $dueCount > 1 ? 's' : '' }}
-            </a>
-            @else
-            <a href="{{ route('flashcards.review') }}"
-               class="btn btn-outline-secondary">
-                <i class="bi bi-layers me-1"></i>Review All
-            </a>
-            @endif
-            <button class="btn btn-primary" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#addCardForm">
-                <i class="bi bi-plus-lg me-1"></i>Add Card
-            </button>
-        </div>
+{{-- ── HEADER ROW ─────────────────────────────────────────── --}}
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.5rem">
+    <div>
+        <div class="section-title" style="margin-bottom:.2rem">Flashcards</div>
+        <p style="color:var(--c-muted);font-size:.82rem;margin:0">{{ $flashcards->total() }} cards total</p>
     </div>
+    <div style="display:flex;gap:.5rem">
+        @if($dueCount > 0)
+        <a href="{{ route('flashcards.review') }}" class="btn-st-primary">
+            <i class="bi bi-play-fill"></i> Review {{ $dueCount }} Due Card{{ $dueCount > 1 ? 's' : '' }}
+        </a>
+        @else
+        <a href="{{ route('flashcards.review') }}" class="btn-st-ghost">
+            <i class="bi bi-layers"></i> Review All
+        </a>
+        @endif
+        <button class="btn-st-ghost" type="button" data-bs-toggle="collapse" data-bs-target="#addCardForm">
+            <i class="bi bi-plus-lg"></i> Add Card
+        </button>
+    </div>
+</div>
 
-    {{-- ── ADD CARD FORM ─────────────────────────────────────── --}}
-    <div class="col-12">
-        <div class="collapse" id="addCardForm">
-            <div class="card border-primary border-opacity-25">
-                <div class="card-header bg-transparent">
-                    <i class="bi bi-plus-circle-fill text-primary me-2"></i>New Flashcard
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ route('flashcards.store') }}">
-                        @csrf
-                        <div class="row g-3">
-                            <div class="col-md-5">
-                                <label class="form-label fw-500 small">Question / Front *</label>
-                                <textarea name="question" class="form-control" rows="3"
-                                          placeholder="What is…?" required>{{ old('question') }}</textarea>
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label fw-500 small">Answer / Back *</label>
-                                <textarea name="answer" class="form-control" rows="3"
-                                          placeholder="The answer is…" required>{{ old('answer') }}</textarea>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label fw-500 small">Subject</label>
-                                <select name="subject_id" class="form-select mb-3">
-                                    <option value="">— None —</option>
-                                    @foreach($subjects as $s)
-                                        <option value="{{ $s->id }}"
-                                            {{ old('subject_id') == $s->id ? 'selected' : '' }}>
-                                            {{ $s->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <button class="btn btn-primary w-100">
-                                    <i class="bi bi-plus me-1"></i>Save
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+{{-- ── ADD CARD FORM ─────────────────────────────────────── --}}
+<div class="collapse" id="addCardForm" style="margin-bottom:1.25rem">
+    <div class="st-card" style="border-color:rgba(0,212,170,.25)">
+        <div class="st-card-header">
+            <div class="st-card-title">
+                <div class="icon icon-teal"><i class="bi bi-plus-circle-fill"></i></div>
+                New Flashcard
             </div>
         </div>
+        <div style="padding:1.25rem">
+            <form method="POST" action="{{ route('flashcards.store') }}">
+                @csrf
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="st-label">Question / Front *</label>
+                        <textarea name="question" class="st-textarea" rows="3" placeholder="What is…?" required>{{ old('question') }}</textarea>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="st-label">Answer / Back *</label>
+                        <textarea name="answer" class="st-textarea" rows="3" placeholder="The answer is…" required>{{ old('answer') }}</textarea>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="st-label">Subject</label>
+                        <select name="subject_id" class="st-select" style="margin-bottom:.75rem">
+                            <option value="">— None —</option>
+                            @foreach($subjects as $s)
+                                <option value="{{ $s->id }}" {{ old('subject_id') == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
+                            @endforeach
+                        </select>
+                        <button class="btn-st-primary" style="width:100%;justify-content:center">
+                            <i class="bi bi-plus"></i> Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    {{-- ── FILTER BAR ────────────────────────────────────────── --}}
-    <div class="col-12">
-        <form method="GET" class="d-flex gap-2 align-items-center flex-wrap">
-            <select name="subject_id" class="form-select form-select-sm" style="width:auto"
-                    onchange="this.form.submit()">
-                <option value="">All Subjects</option>
-                @foreach($subjects as $s)
-                    <option value="{{ $s->id }}"
-                        {{ request('subject_id') == $s->id ? 'selected' : '' }}>
-                        {{ $s->name }}
-                    </option>
-                @endforeach
-            </select>
-            @if(request('subject_id'))
-                <a href="{{ route('flashcards.index') }}"
-                   class="btn btn-sm btn-outline-secondary">Clear</a>
-            @endif
-        </form>
-    </div>
+{{-- ── FILTER BAR ────────────────────────────────────────── --}}
+<form method="GET" style="margin-bottom:1.25rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+    <select name="subject_id" class="st-select" style="width:auto;min-width:140px" onchange="this.form.submit()">
+        <option value="">All Subjects</option>
+        @foreach($subjects as $s)
+            <option value="{{ $s->id }}" {{ request('subject_id') == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
+        @endforeach
+    </select>
+    @if(request('subject_id'))
+        <a href="{{ route('flashcards.index') }}" class="btn-st-ghost" style="font-size:.78rem;padding:.45rem .75rem">Clear</a>
+    @endif
+</form>
 
-    {{-- ── CARD GRID ─────────────────────────────────────────── --}}
+{{-- ── CARD GRID ─────────────────────────────────────────── --}}
+<div class="row g-3">
     @forelse($flashcards as $card)
     <div class="col-md-4 col-sm-6">
-        <div class="card h-100 position-relative">
-            {{-- Difficulty indicator strip --}}
-            <div style="height:4px;border-radius:8px 8px 0 0;
-                        background:{{ $card->difficulty === 'easy' ? '#10b981' : ($card->difficulty === 'hard' ? '#ef4444' : '#f59e0b') }}">
-            </div>
-            <div class="card-body d-flex flex-column">
+        <div class="st-card h-100" style="position:relative;overflow:hidden">
+            {{-- Difficulty top line --}}
+            <div style="height:3px;background:{{ $card->difficulty === 'easy' ? 'var(--c-teal)' : ($card->difficulty === 'hard' ? 'var(--c-coral)' : 'var(--c-amber)') }}"></div>
+
+            <div style="padding:1rem;display:flex;flex-direction:column;height:calc(100% - 3px)">
                 {{-- Subject badge --}}
                 @if($card->subject)
-                <span class="badge mb-2 align-self-start"
-                      style="background:{{ $card->subject->color }}20;
-                             color:{{ $card->subject->color }};font-size:.7rem">
+                <span class="tag" style="background:{{ $card->subject->color }}15;color:{{ $card->subject->color }};border-color:{{ $card->subject->color }}30;width:fit-content;margin-bottom:.65rem;font-size:.68rem">
                     {{ $card->subject->name }}
                 </span>
                 @endif
 
-                <div class="fw-500 small mb-2 text-truncate-3"
-                     style="overflow:hidden;display:-webkit-box;
-                            -webkit-line-clamp:2;-webkit-box-orient:vertical">
-                    <span class="text-muted" style="font-size:.7rem">Q:</span>
+                {{-- Question --}}
+                <div style="font-size:.8rem;color:var(--c-muted);margin-bottom:.25rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Q</div>
+                <div style="font-size:.875rem;font-weight:500;color:var(--c-text);flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:.65rem">
                     {{ $card->question }}
                 </div>
-                <div class="text-muted small mb-3 text-truncate-3"
-                     style="overflow:hidden;display:-webkit-box;
-                            -webkit-line-clamp:2;-webkit-box-orient:vertical;
-                            border-left:3px solid #e2e8f0;padding-left:.5rem">
-                    <span style="font-size:.7rem">A:</span> {{ $card->answer }}
+
+                {{-- Answer preview --}}
+                <div style="font-size:.8rem;color:var(--c-muted);margin-bottom:.25rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em">A</div>
+                <div style="font-size:.82rem;color:var(--c-muted2);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;border-left:2px solid var(--c-border2);padding-left:.6rem;margin-bottom:.85rem">
+                    {{ $card->answer }}
                 </div>
 
-                <div class="mt-auto d-flex align-items-center justify-content-between">
-                    <div>
-                        <span class="badge text-bg-{{ $card->difficultyColor() }} me-1">
-                            {{ $card->difficulty }}
-                        </span>
-                        <span class="text-muted" style="font-size:.7rem">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto">
+                    <div style="display:flex;align-items:center;gap:.4rem">
+                        @php $dc = ['easy'=>'teal','medium'=>'amber','hard'=>'coral'][$card->difficulty] ?? 'muted'; @endphp
+                        <span class="tag tag-{{ $dc }}" style="font-size:.67rem">{{ $card->difficulty }}</span>
+                        <span style="font-size:.72rem;color:var(--c-muted)">
                             <i class="bi bi-arrow-repeat"></i> {{ $card->review_count }}x
                         </span>
                     </div>
-                    <div class="d-flex gap-1">
-                        <a href="{{ route('flashcards.edit', $card) }}"
-                           class="btn btn-sm btn-light py-0">
+                    <div style="display:flex;gap:.3rem">
+                        <a href="{{ route('flashcards.edit', $card) }}" class="btn-st-ghost" style="padding:.3rem .55rem;font-size:.8rem">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <form method="POST" action="{{ route('flashcards.destroy', $card) }}"
-                              onsubmit="return confirm('Delete this card?')">
+                        <form method="POST" action="{{ route('flashcards.destroy', $card) }}" onsubmit="return confirm('Delete this card?')">
                             @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-light py-0 text-danger">
+                            <button class="btn-st-danger" style="padding:.3rem .55rem;font-size:.8rem">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -151,37 +129,29 @@
                 </div>
 
                 @if($card->isDueForReview())
-                    <div class="mt-2">
-                        <span class="badge text-bg-warning w-100 py-1">
-                            <i class="bi bi-alarm me-1"></i>Due for review
-                        </span>
-                    </div>
+                <div style="margin-top:.65rem;padding:.35rem .7rem;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:6px;font-size:.72rem;color:var(--c-amber);font-weight:600;text-align:center">
+                    <i class="bi bi-alarm me-1"></i>Due for review
+                </div>
                 @else
-                    <div class="mt-2">
-                        <span class="badge text-bg-light text-muted w-100 py-1" style="font-size:.65rem">
-                            Next: {{ $card->next_review_at?->diffForHumans() ?? 'now' }}
-                        </span>
-                    </div>
+                <div style="margin-top:.65rem;padding:.3rem;text-align:center;font-size:.68rem;color:var(--c-muted)">
+                    Next: {{ $card->next_review_at?->diffForHumans() ?? 'now' }}
+                </div>
                 @endif
             </div>
         </div>
     </div>
     @empty
     <div class="col-12">
-        <div class="card">
-            <div class="card-body text-center py-5 text-muted">
-                <i class="bi bi-layers fs-1 d-block mb-3 text-secondary"></i>
-                <h5>No flashcards yet</h5>
-                <p class="small">Click "Add Card" to create your first flashcard.</p>
-                <button class="btn btn-primary" data-bs-toggle="collapse"
-                        data-bs-target="#addCardForm">
-                    <i class="bi bi-plus me-1"></i>Add First Card
-                </button>
+        <div class="st-card">
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="bi bi-layers"></i></div>
+                <p>No flashcards yet.<br>
+                <a href="#addCardForm" onclick="document.getElementById('addCardForm').classList.add('show')">Create your first card!</a></p>
             </div>
         </div>
     </div>
     @endforelse
 </div>
 
-<div class="mt-4">{{ $flashcards->links() }}</div>
+<div style="margin-top:1.5rem">{{ $flashcards->links() }}</div>
 @endsection
