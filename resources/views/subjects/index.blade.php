@@ -8,36 +8,39 @@
 
     {{-- ── ADD SUBJECT FORM ──────────────────────────────────── --}}
     <div class="col-12">
-        <div class="st-card">
-            <div class="st-card-header">
-                <div class="st-card-title">
-                    <div class="icon icon-teal"><i class="bi bi-plus-circle-fill"></i></div>
-                    Add New Subject
-                </div>
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-plus-circle-fill text-primary me-2"></i>
+                <span>Add New Subject</span>
             </div>
-            <div style="padding:1.25rem">
+            <div class="card-body">
                 <form method="POST" action="{{ route('subjects.store') }}">
                     @csrf
                     <div class="row g-3 align-items-end">
                         <div class="col-md-4">
-                            <label class="st-label">Subject Name *</label>
-                            <input type="text" name="name" class="st-input" placeholder="e.g. Mathematics" value="{{ old('name') }}" required>
+                            <label class="form-label fw-500 small">Subject Name *</label>
+                            <input type="text" name="name" class="form-control"
+                                   placeholder="e.g. Mathematics"
+                                   value="{{ old('name') }}" required>
                         </div>
                         <div class="col-md-2">
-                            <label class="st-label">Colour</label>
-                            <div style="display:flex;align-items:center;gap:.5rem">
-                                <input type="color" name="color" id="colorPicker" value="{{ old('color', '#00d4aa') }}"
-                                       style="width:44px;height:40px;border:1px solid var(--c-border2);background:var(--c-surface2);border-radius:var(--radius-sm);cursor:pointer;padding:2px">
-                                <input type="text" id="colorHex" class="st-input" value="{{ old('color', '#00d4aa') }}" readonly style="width:90px;font-size:.8rem;font-family:monospace">
+                            <label class="form-label fw-500 small">Colour</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="color" name="color" class="form-control form-control-color"
+                                       value="{{ old('color', '#6366f1') }}" style="width:50px;height:38px">
+                                <input type="text" id="colorHex" class="form-control form-control-sm"
+                                       value="{{ old('color', '#6366f1') }}" readonly style="width:80px">
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="st-label">Description</label>
-                            <input type="text" name="description" class="st-input" placeholder="Optional description" value="{{ old('description') }}">
+                            <label class="form-label fw-500 small">Description</label>
+                            <input type="text" name="description" class="form-control"
+                                   placeholder="Optional description"
+                                   value="{{ old('description') }}">
                         </div>
                         <div class="col-md-2">
-                            <button class="btn-st-primary" style="width:100%;justify-content:center">
-                                <i class="bi bi-plus"></i> Add Subject
+                            <button class="btn btn-primary w-100">
+                                <i class="bi bi-plus me-1"></i>Add Subject
                             </button>
                         </div>
                     </div>
@@ -51,65 +54,77 @@
         <div class="row g-3">
             @forelse($subjects as $subject)
             <div class="col-md-4 col-sm-6">
-                <div class="st-card h-100" style="overflow:hidden;transition:transform .2s,box-shadow .2s">
+                <div class="card h-100">
                     {{-- Color bar --}}
-                    <div style="height:4px;background:{{ $subject->color }}"></div>
-
-                    <div style="padding:1.1rem">
-                        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.85rem">
+                    <div style="height:6px;background:{{ $subject->color }};
+                                border-radius:12px 12px 0 0"></div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between mb-2">
                             <div>
-                                <div style="font-weight:700;font-size:.95rem;color:var(--c-text);margin-bottom:.2rem">{{ $subject->name }}</div>
+                                <h6 class="fw-700 mb-0">{{ $subject->name }}</h6>
                                 @if($subject->description)
-                                    <div style="font-size:.77rem;color:var(--c-muted)">{{ $subject->description }}</div>
+                                    <small class="text-muted">{{ $subject->description }}</small>
                                 @endif
                             </div>
-                            <div style="width:28px;height:28px;border-radius:8px;background:{{ $subject->color }}20;border:1.5px solid {{ $subject->color }}40;flex-shrink:0;margin-left:.5rem"></div>
+                            <span class="rounded-circle d-inline-block ms-2 flex-shrink-0"
+                                  style="width:18px;height:18px;background:{{ $subject->color }};
+                                         border:2px solid #fff;box-shadow:0 0 0 2px {{ $subject->color }}44">
+                            </span>
                         </div>
 
                         {{-- Stats --}}
-                        <div style="display:flex;gap:0;margin-bottom:.85rem;background:var(--c-surface2);border-radius:var(--radius-sm);overflow:hidden">
-                            <div style="flex:1;text-align:center;padding:.6rem .5rem;border-right:1px solid var(--c-border)">
-                                <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--c-teal)">{{ $subject->tasks_count }}</div>
-                                <div style="font-size:.62rem;color:var(--c-muted);text-transform:uppercase;letter-spacing:.06em">Tasks</div>
+                        <div class="d-flex gap-3 my-3 text-center">
+                            <div>
+                                <div class="fw-700 text-primary">{{ $subject->tasks_count }}</div>
+                                <div class="text-muted" style="font-size:.7rem">Tasks</div>
                             </div>
-                            <div style="flex:1;text-align:center;padding:.6rem .5rem;border-right:1px solid var(--c-border)">
-                                <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--c-violet)">{{ $subject->notes_count }}</div>
-                                <div style="font-size:.62rem;color:var(--c-muted);text-transform:uppercase;letter-spacing:.06em">Notes</div>
+                            <div>
+                                <div class="fw-700 text-success">{{ $subject->notes_count }}</div>
+                                <div class="text-muted" style="font-size:.7rem">Notes</div>
                             </div>
-                            <div style="flex:1;text-align:center;padding:.6rem .5rem">
-                                <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--c-amber)">{{ $subject->flashcards_count }}</div>
-                                <div style="font-size:.62rem;color:var(--c-muted);text-transform:uppercase;letter-spacing:.06em">Cards</div>
+                            <div>
+                                <div class="fw-700 text-info">{{ $subject->flashcards_count }}</div>
+                                <div class="text-muted" style="font-size:.7rem">Cards</div>
                             </div>
                         </div>
 
-                        {{-- Actions --}}
-                        <div style="display:flex;gap:.4rem;justify-content:flex-end">
-                            <button type="button" class="btn-st-ghost" style="font-size:.78rem;padding:.35rem .7rem"
-                                    data-bs-toggle="collapse" data-bs-target="#editSubject{{ $subject->id }}">
-                                <i class="bi bi-pencil"></i> Edit
+                        {{-- Edit form (inline collapse) --}}
+                        <div class="d-flex gap-1 justify-content-end">
+                            <button class="btn btn-sm btn-light" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#editSubject{{ $subject->id }}">
+                                <i class="bi bi-pencil me-1"></i>Edit
                             </button>
-                            <form method="POST" action="{{ route('subjects.destroy', $subject) }}" onsubmit="return confirm('Delete subject? This will unlink related items.')">
+                            <form method="POST" action="{{ route('subjects.destroy', $subject) }}"
+                                  onsubmit="return confirm('Delete subject? This will unlink related items.')">
                                 @csrf @method('DELETE')
-                                <button class="btn-st-danger" style="font-size:.78rem;padding:.35rem .7rem">
+                                <button class="btn btn-sm btn-light text-danger">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
                         </div>
 
                         {{-- Inline edit --}}
-                        <div class="collapse" id="editSubject{{ $subject->id }}" style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--c-border)">
+                        <div class="collapse mt-3" id="editSubject{{ $subject->id }}">
                             <form method="POST" action="{{ route('subjects.update', $subject) }}">
                                 @csrf @method('PUT')
-                                <div style="margin-bottom:.6rem">
-                                    <input type="text" name="name" class="st-input" value="{{ $subject->name }}" required>
+                                <div class="mb-2">
+                                    <input type="text" name="name" class="form-control form-control-sm"
+                                           value="{{ $subject->name }}" required>
                                 </div>
-                                <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.6rem">
-                                    <input type="color" name="color" class="edit-color-picker"
+                                <div class="mb-2 d-flex gap-2 align-items-center">
+                                    <input type="color" name="color"
+                                           class="form-control form-control-color form-control-sm"
                                            value="{{ $subject->color }}"
-                                           style="width:40px;height:36px;border:1px solid var(--c-border2);background:var(--c-surface2);border-radius:var(--radius-sm);cursor:pointer;padding:2px">
-                                    <input type="text" name="description" class="st-input" value="{{ $subject->description }}" placeholder="Description">
+                                           style="width:40px;height:32px">
+                                    <input type="text" name="description"
+                                           class="form-control form-control-sm"
+                                           value="{{ $subject->description }}"
+                                           placeholder="Description">
                                 </div>
-                                <button class="btn-st-primary" style="width:100%;justify-content:center">Save Changes</button>
+                                <button class="btn btn-sm btn-primary w-100">
+                                    Save Changes
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -117,10 +132,11 @@
             </div>
             @empty
             <div class="col-12">
-                <div class="st-card">
-                    <div class="empty-state">
-                        <div class="empty-state-icon"><i class="bi bi-book"></i></div>
-                        <p>No subjects yet.<br>Create subjects to organize your tasks, notes, and flashcards.</p>
+                <div class="card">
+                    <div class="card-body text-center py-5 text-muted">
+                        <i class="bi bi-book fs-1 d-block mb-3 text-secondary"></i>
+                        <h5>No subjects yet</h5>
+                        <p class="small">Create subjects to organize your tasks, notes, and flashcards.</p>
                     </div>
                 </div>
             </div>
@@ -133,8 +149,10 @@
 
 @push('scripts')
 <script>
-document.getElementById('colorPicker')?.addEventListener('input', function() {
-    document.getElementById('colorHex').value = this.value;
-});
+// Sync color picker → hex text display
+document.querySelector('input[type="color"][name="color"]')
+    ?.addEventListener('input', function() {
+        document.getElementById('colorHex').value = this.value;
+    });
 </script>
 @endpush

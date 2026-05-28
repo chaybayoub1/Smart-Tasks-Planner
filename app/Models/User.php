@@ -11,7 +11,13 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'xp', 'level'];
+    protected $fillable = [
+        'name', 'username', 'email', 'password',
+        'avatar', 'bio', 'university', 'academic_level',
+        'field_of_study', 'study_methods', 'study_goal',
+        'theme', 'timezone', 'language',
+        'xp', 'level',
+    ];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -19,25 +25,46 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'study_methods'     => 'array',
+            'study_goal'        => 'float',
         ];
     }
 
     // ── Relationships ─────────────────────────────────────────
-    public function subjects()      { return $this->hasMany(Subject::class); }
-    public function tasks()         { return $this->hasMany(Task::class); }
-    public function notes()         { return $this->hasMany(Note::class); }
+    public function subjects()         { return $this->hasMany(Subject::class); }
+    public function tasks()            { return $this->hasMany(Task::class); }
+    public function notes()            { return $this->hasMany(Note::class); }
     public function pomodoroSessions() { return $this->hasMany(PomodoroSession::class); }
-    public function streak()        { return $this->hasOne(Streak::class); }
-    public function flashcards()    { return $this->hasMany(Flashcard::class); }
-    public function exams()         { return $this->hasMany(Exam::class); }
-    public function badges()        { return $this->belongsToMany(Badge::class, 'user_badges')->withPivot('earned_at'); }
+    public function streak()           { return $this->hasOne(Streak::class); }
+    public function flashcards()       { return $this->hasMany(Flashcard::class); }
+    public function exams()            { return $this->hasMany(Exam::class); }
+    public function badges()           { return $this->belongsToMany(Badge::class, 'user_badges')->withPivot('earned_at'); }
+
+    // Collaboration
+    public function ownedGroups()  { return $this->hasMany(StudyGroup::class, 'owner_id'); }
+    public function studyGroups()  { return $this->belongsToMany(StudyGroup::class, 'study_group_members')->withPivot('role', 'joined_at'); }
+    public function groupMessages(){ return $this->hasMany(GroupMessage::class); }
+
+    // ── Avatar helper ─────────────────────────────────────────
+    public function avatarUrl(): string
+    {
+        if ($this->avatar) {
+            return \Illuminate\Support\Facades\Storage::url($this->avatar);
+        }
+        return '';
+    }
+
+    public function initials(): string
+    {
+        $words = explode(' ', trim($this->name));
+        if (count($words) >= 2) {
+            return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+        }
+        return strtoupper(substr($this->name, 0, 2));
+    }
 
     // ── Gamification helpers ───────────────────────────────────
-
-    /**
-     * XP required to reach a given level: 100 * level^1.5
-     */
     public function xpForLevel(int $level): int
     {
         return (int) (100 * pow($level, 1.5));
@@ -50,28 +77,23 @@ class User extends Authenticatable
 
     public function xpProgress(): int
     {
-        // XP accumulated toward the next level (reset each level)
         $xpThisLevel = $this->xpForLevel($this->level);
         $xpNextLevel = $this->xpForNextLevel();
         $earned = $this->xp - $xpThisLevel;
-        $needed  = $xpNextLevel - $xpThisLevel;
+        $needed = $xpNextLevel - $xpThisLevel;
         return $needed > 0 ? max(0, (int) (($earned / $needed) * 100)) : 100;
     }
 
     public function addXp(int $amount): void
     {
         $this->xp += $amount;
-
-        // Level up while XP exceeds threshold
         while ($this->xp >= $this->xpForNextLevel()) {
             $this->level++;
         }
-
         $this->save();
     }
 
     // ── Computed stats ─────────────────────────────────────────
-
     public function totalStudyMinutes(): int
     {
         return (int) $this->pomodoroSessions()

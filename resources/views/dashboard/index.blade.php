@@ -6,243 +6,177 @@
 
 @section('content')
 
-{{-- ── WELCOME ROW ─────────────────────────────────────────── --}}
-<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
-    <div>
-        <div class="section-title" style="margin-bottom:.25rem">
-            Welcome back, <span>{{ auth()->user()->name }}</span>
-        </div>
-        <p style="color:var(--c-muted);font-size:.85rem;margin:0">
-            Here's what's on your plate today.
-        </p>
-    </div>
-    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-        <a href="{{ route('pomodoro.index') }}" class="btn-st-primary">
-            <i class="bi bi-stopwatch-fill"></i> Start Focus
-        </a>
-        <a href="{{ route('tasks.index') }}" class="btn-st-ghost">
-            <i class="bi bi-plus-lg"></i> Add Task
-        </a>
-    </div>
-</div>
-
 {{-- ── STAT CARDS ──────────────────────────────────────────── --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
-        <div class="stat-card teal">
+        <div class="stat-card" style="background: linear-gradient(135deg,#6366f1,#8b5cf6)">
             <div class="stat-value">{{ floor($totalMinutes / 60) }}h {{ $totalMinutes % 60 }}m</div>
             <div class="stat-label">Total Study Time</div>
-            <i class="bi bi-clock-fill stat-bg-icon"></i>
+            <i class="bi bi-clock-fill stat-icon"></i>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="stat-card amber">
+        <div class="stat-card" style="background: linear-gradient(135deg,#f59e0b,#ef4444)">
             <div class="stat-value">{{ $streak->current_streak ?? 0 }}</div>
-            <div class="stat-label">Day Streak</div>
-            <i class="bi bi-fire stat-bg-icon"></i>
+            <div class="stat-label">Day Streak 🔥</div>
+            <i class="bi bi-fire stat-icon"></i>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="stat-card coral">
+        <div class="stat-card" style="background: linear-gradient(135deg,#10b981,#059669)">
             <div class="stat-value">{{ $totalSessions }}</div>
             <div class="stat-label">Pomodoro Sessions</div>
-            <i class="bi bi-stopwatch-fill stat-bg-icon"></i>
+            <i class="bi bi-stopwatch-fill stat-icon"></i>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="stat-card violet">
+        <div class="stat-card" style="background: linear-gradient(135deg,#3b82f6,#1d4ed8)">
             <div class="stat-value">{{ $user->level }}</div>
-            <div class="stat-label">Current Level</div>
-            <i class="bi bi-star-fill stat-bg-icon"></i>
+            <div class="stat-label">Current Level ⭐</div>
+            <i class="bi bi-star-fill stat-icon"></i>
         </div>
     </div>
 </div>
 
-{{-- ── ROW 2: Chart + Notifications ──────────────────────── --}}
+{{-- ── ROW 2 ────────────────────────────────────────────────── --}}
 <div class="row g-3 mb-4">
 
     {{-- Weekly Chart --}}
     <div class="col-md-7">
-        <div class="st-card h-100">
-            <div class="st-card-header">
-                <div class="st-card-title">
-                    <div class="icon icon-teal"><i class="bi bi-bar-chart-fill"></i></div>
-                    Weekly Focus Minutes
-                </div>
-                <span class="tag tag-muted">Last 7 days</span>
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-bar-chart-fill text-primary me-2"></i>Weekly Study Minutes</span>
+                <span class="badge text-bg-light text-muted small">Last 7 days</span>
             </div>
-            <div style="padding:1.25rem">
+            <div class="card-body">
                 <canvas id="weeklyChart" height="90"></canvas>
             </div>
         </div>
     </div>
 
-    {{-- Notifications --}}
+    {{-- Quick stats + alerts --}}
     <div class="col-md-5">
-        <div class="st-card h-100">
-            <div class="st-card-header">
-                <div class="st-card-title">
-                    <div class="icon icon-amber"><i class="bi bi-bell-fill"></i></div>
-                    Notifications
-                </div>
-            </div>
-            <div>
-                @if($overdueTasks > 0)
-                <div class="st-list-item">
-                    <div style="width:30px;height:30px;border-radius:8px;background:rgba(255,107,107,.12);display:flex;align-items:center;justify-content:center;color:var(--c-coral);flex-shrink:0">
-                        <i class="bi bi-exclamation-triangle-fill" style="font-size:.85rem"></i>
-                    </div>
-                    <div style="flex:1;min-width:0">
-                        <div style="font-size:.82rem;font-weight:600;color:var(--c-coral)">{{ $overdueTasks }} overdue task{{ $overdueTasks > 1 ? 's' : '' }}</div>
-                        <div style="font-size:.73rem;color:var(--c-muted)">Needs attention</div>
-                    </div>
-                    <a href="{{ route('tasks.index', ['status'=>'pending']) }}" class="btn-st-danger">View</a>
-                </div>
-                @endif
+        <div class="card h-100">
+            <div class="card-header"><i class="bi bi-bell-fill text-warning me-2"></i>Notifications</div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @if($overdueTasks > 0)
+                    <li class="list-group-item d-flex align-items-center gap-2 text-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span><strong>{{ $overdueTasks }}</strong> overdue task{{ $overdueTasks > 1 ? 's' : '' }}</span>
+                        <a href="{{ route('tasks.index', ['status'=>'pending']) }}" class="ms-auto btn btn-sm btn-outline-danger py-0">View</a>
+                    </li>
+                    @endif
 
-                @if($flashcardsDue > 0)
-                <div class="st-list-item">
-                    <div style="width:30px;height:30px;border-radius:8px;background:rgba(0,212,170,.12);display:flex;align-items:center;justify-content:center;color:var(--c-teal);flex-shrink:0">
-                        <i class="bi bi-layers-fill" style="font-size:.85rem"></i>
-                    </div>
-                    <div style="flex:1;min-width:0">
-                        <div style="font-size:.82rem;font-weight:600;color:var(--c-teal)">{{ $flashcardsDue }} flashcard{{ $flashcardsDue > 1 ? 's' : '' }} due</div>
-                        <div style="font-size:.73rem;color:var(--c-muted)">Ready to review</div>
-                    </div>
-                    <a href="{{ route('flashcards.review') }}" class="btn-st-ghost" style="font-size:.75rem;padding:.3rem .65rem">Review</a>
-                </div>
-                @endif
+                    @if($flashcardsDue > 0)
+                    <li class="list-group-item d-flex align-items-center gap-2 text-info">
+                        <i class="bi bi-layers-fill"></i>
+                        <span><strong>{{ $flashcardsDue }}</strong> flashcard{{ $flashcardsDue > 1 ? 's' : '' }} due</span>
+                        <a href="{{ route('flashcards.review') }}" class="ms-auto btn btn-sm btn-outline-info py-0">Review</a>
+                    </li>
+                    @endif
 
-                @foreach($upcomingExams->take(3) as $exam)
-                <div class="st-list-item">
-                    <div style="width:30px;height:30px;border-radius:8px;background:rgba(124,106,247,.12);display:flex;align-items:center;justify-content:center;color:var(--c-violet);flex-shrink:0">
-                        <i class="bi bi-calendar-event" style="font-size:.85rem"></i>
-                    </div>
-                    <div style="flex:1;min-width:0">
-                        <div style="font-size:.82rem;font-weight:600;color:var(--c-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $exam->title }}</div>
-                        <div style="font-size:.73rem;color:var(--c-muted)">in {{ $exam->daysUntil() }} day{{ $exam->daysUntil() != 1 ? 's' : '' }}</div>
-                    </div>
-                </div>
-                @endforeach
+                    @foreach($upcomingExams->take(2) as $exam)
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="bi bi-calendar-event text-{{ $exam->urgencyClass() }}"></i>
+                        <span class="small"><strong>{{ $exam->title }}</strong> in {{ $exam->daysUntil() }} day{{ $exam->daysUntil() != 1 ? 's' : '' }}</span>
+                    </li>
+                    @endforeach
 
-                @if($overdueTasks === 0 && $flashcardsDue === 0 && $upcomingExams->isEmpty())
-                <div class="empty-state">
-                    <div class="empty-state-icon" style="background:rgba(0,212,170,.08);color:var(--c-teal)">
-                        <i class="bi bi-check-circle-fill"></i>
-                    </div>
-                    <p style="color:var(--c-muted2)">All caught up! Keep it up.</p>
-                </div>
-                @endif
+                    @if($overdueTasks === 0 && $flashcardsDue === 0 && $upcomingExams->isEmpty())
+                    <li class="list-group-item text-muted text-center py-4">
+                        <i class="bi bi-check-circle-fill text-success fs-3 d-block mb-2"></i>
+                        All caught up! 🎉
+                    </li>
+                    @endif
 
-                <div style="padding:.65rem 1.25rem;border-top:1px solid var(--c-border);display:flex;gap:1rem">
-                    <span style="font-size:.75rem;color:var(--c-muted)">
-                        <i class="bi bi-journal-text me-1" style="color:var(--c-teal)"></i>{{ $totalNotes }} Notes
-                    </span>
-                    <span style="font-size:.75rem;color:var(--c-muted)">
-                        <i class="bi bi-layers me-1" style="color:var(--c-violet)"></i>{{ $totalFlashcards }} Cards
-                    </span>
-                </div>
+                    <li class="list-group-item text-center">
+                        <small class="text-muted">
+                            <i class="bi bi-journal-text me-1"></i>{{ $totalNotes }} Notes &nbsp;·&nbsp;
+                            <i class="bi bi-layers me-1"></i>{{ $totalFlashcards }} Flashcards
+                        </small>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
 
-{{-- ── ROW 3: Tasks + XP / Badges ──────────────────────────── --}}
+{{-- ── ROW 3 ────────────────────────────────────────────────── --}}
 <div class="row g-3 mb-4">
 
     {{-- Upcoming Tasks --}}
     <div class="col-md-6">
-        <div class="st-card h-100">
-            <div class="st-card-header">
-                <div class="st-card-title">
-                    <div class="icon icon-teal"><i class="bi bi-check2-square"></i></div>
-                    Upcoming Tasks
-                </div>
-                <a href="{{ route('tasks.index') }}" class="btn-st-ghost" style="font-size:.75rem;padding:.3rem .65rem">All Tasks</a>
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-check2-square text-primary me-2"></i>Upcoming Tasks</span>
+                <a href="{{ route('tasks.index') }}" class="btn btn-sm btn-outline-primary py-0">All Tasks</a>
             </div>
-            <div>
+            <div class="card-body p-0">
                 @forelse($upcomingTasks as $task)
-                <div class="st-list-item">
-                    <form method="POST" action="{{ route('tasks.toggle', $task) }}" style="flex-shrink:0">
+                <div class="d-flex align-items-center gap-3 px-3 py-2 border-bottom">
+                    <form method="POST" action="{{ route('tasks.toggle', $task) }}">
                         @csrf @method('PATCH')
-                        <button style="background:none;border:none;cursor:pointer;padding:0;color:{{ $task->status === 'completed' ? 'var(--c-teal)' : 'var(--c-muted)' }};font-size:1.1rem;transition:color .15s">
-                            <i class="bi bi-{{ $task->status === 'completed' ? 'check-circle-fill' : 'circle' }}"></i>
+                        <button class="btn btn-sm p-0 border-0 text-{{ $task->status === 'completed' ? 'success' : 'secondary' }}">
+                            <i class="bi bi-{{ $task->status === 'completed' ? 'check-circle-fill' : 'circle' }} fs-5"></i>
                         </button>
                     </form>
-                    <div style="flex:1;min-width:0">
-                        <div style="font-size:.85rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--c-text);{{ $task->status === 'completed' ? 'text-decoration:line-through;opacity:.5' : '' }}">
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="fw-500 text-truncate {{ $task->status === 'completed' ? 'text-decoration-line-through text-muted' : '' }}">
                             {{ $task->title }}
                         </div>
-                        <div style="display:flex;align-items:center;gap:.4rem;margin-top:.15rem">
+                        <small class="text-muted">
                             @if($task->subject)
-                                <span class="tag" style="background:{{ $task->subject->color }}18;color:{{ $task->subject->color }};border-color:{{ $task->subject->color }}30;font-size:.67rem">
-                                    {{ $task->subject->name }}
-                                </span>
+                                <span class="badge" style="background:{{ $task->subject->color }}20;color:{{ $task->subject->color }}">{{ $task->subject->name }}</span>
                             @endif
-                            <span style="font-size:.72rem;color:var(--c-muted)">
-                                {{ $task->due_date->format('M d') }} &middot; {{ $task->duration }}min
-                            </span>
-                        </div>
+                            {{ $task->due_date->format('M d') }} · {{ $task->duration }}min
+                        </small>
                     </div>
-                    @php $pc = ['high'=>'coral','medium'=>'amber','low'=>'teal'][$task->priority] ?? 'muted'; @endphp
-                    <span class="tag tag-{{ $pc }}">{{ $task->priority }}</span>
+                    <span class="badge text-bg-{{ $task->priorityBadgeClass() }} badge-sm">{{ $task->priority }}</span>
                 </div>
                 @empty
-                <div class="empty-state">
-                    <div class="empty-state-icon"><i class="bi bi-calendar-check"></i></div>
-                    <p>No upcoming tasks.<br><a href="{{ route('tasks.index') }}">Add one!</a></p>
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-calendar-check fs-2 d-block mb-2"></i>
+                    No upcoming tasks. <a href="{{ route('tasks.index') }}">Add one!</a>
                 </div>
                 @endforelse
             </div>
         </div>
     </div>
 
-    {{-- XP + Badges --}}
+    {{-- XP + Level + Badges --}}
     <div class="col-md-6">
-
-        {{-- Level card --}}
-        <div class="st-card mb-3">
-            <div style="padding:1.25rem">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.85rem">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-2">
                     <div>
-                        <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--c-text)">Level {{ $user->level }}</div>
-                        <div style="font-size:.75rem;color:var(--c-muted);margin-top:.15rem">
-                            {{ number_format($user->xp) }} / {{ number_format($user->xpForNextLevel()) }} XP
-                        </div>
+                        <h6 class="mb-0 fw-bold">Level {{ $user->level }}</h6>
+                        <small class="text-muted">{{ number_format($user->xp) }} / {{ number_format($user->xpForNextLevel()) }} XP to next level</small>
                     </div>
-                    <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--c-amber)">
-                        {{ $user->xpProgress() }}<span style="font-size:.9rem">%</span>
-                    </div>
+                    <div class="text-warning fs-2">⭐</div>
                 </div>
-                <div class="st-progress">
-                    <div class="st-progress-fill teal" style="width:{{ $user->xpProgress() }}%"></div>
+                <div class="progress" style="height:10px; border-radius:99px;">
+                    <div class="progress-bar" style="width:{{ $user->xpProgress() }}%; background:linear-gradient(90deg,#6366f1,#8b5cf6); border-radius:99px;"></div>
                 </div>
-                <div style="display:flex;justify-content:space-between;margin-top:.5rem">
-                    <span style="font-size:.72rem;color:var(--c-muted)">Level {{ $user->level }}</span>
-                    <span style="font-size:.72rem;color:var(--c-muted)">Level {{ $user->level + 1 }}</span>
+                <div class="d-flex justify-content-between mt-1">
+                    <small class="text-muted">{{ $user->xpProgress() }}%</small>
+                    <small class="text-muted">Best streak: {{ $streak->longest_streak ?? 0 }} days</small>
                 </div>
             </div>
         </div>
 
         {{-- Badges --}}
-        <div class="st-card">
-            <div class="st-card-header">
-                <div class="st-card-title">
-                    <div class="icon icon-amber"><i class="bi bi-award-fill"></i></div>
-                    Badges
-                </div>
-                <span style="font-size:.75rem;color:var(--c-muted)">{{ $badges->count() }} earned</span>
-            </div>
-            <div style="padding:1.1rem">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-award-fill text-warning me-2"></i>Badges</div>
+            <div class="card-body">
                 @if($badges->isEmpty())
-                    <p style="font-size:.82rem;color:var(--c-muted);margin:0">Complete sessions to earn badges!</p>
+                    <p class="text-muted small mb-0">Complete sessions to earn badges!</p>
                 @else
-                <div style="display:flex;flex-wrap:wrap;gap:.6rem">
+                <div class="d-flex flex-wrap gap-2">
                     @foreach($badges as $badge)
-                    <div style="text-align:center;width:56px" title="{{ $badge->name }}: {{ $badge->description }}"
-                         data-bs-toggle="tooltip">
-                        <div style="width:44px;height:44px;border-radius:12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin:0 auto .3rem">{{ $badge->icon }}</div>
-                        <div style="font-size:.62rem;color:var(--c-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $badge->name }}</div>
+                    <div class="text-center" title="{{ $badge->name }}: {{ $badge->description }}" data-bs-toggle="tooltip">
+                        <div class="fs-2" style="line-height:1">{{ $badge->icon }}</div>
+                        <div style="font-size:.65rem; color:#666; max-width:60px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ $badge->name }}</div>
                     </div>
                     @endforeach
                 </div>
@@ -253,24 +187,24 @@
 </div>
 
 {{-- ── QUICK ACTIONS ────────────────────────────────────────── --}}
-<div class="st-card">
-    <div style="padding:1.1rem 1.25rem">
-        <div style="font-family:var(--font-display);font-size:.82rem;font-weight:700;color:var(--c-muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.9rem">Quick Actions</div>
-        <div style="display:flex;flex-wrap:wrap;gap:.6rem">
-            <a href="{{ route('pomodoro.index') }}" class="btn-st-primary">
-                <i class="bi bi-stopwatch-fill"></i> Start Pomodoro
+<div class="card">
+    <div class="card-body">
+        <h6 class="fw-semibold mb-3"><i class="bi bi-lightning-fill text-warning me-2"></i>Quick Actions</h6>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('pomodoro.index') }}" class="btn btn-primary">
+                <i class="bi bi-stopwatch me-1"></i> Start Pomodoro
             </a>
-            <a href="{{ route('notes.index') }}" class="btn-st-ghost">
-                <i class="bi bi-journal-plus"></i> New Note
+            <a href="{{ route('notes.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-plus-lg me-1"></i> New Note
             </a>
-            <a href="{{ route('flashcards.review') }}" class="btn-st-ghost">
-                <i class="bi bi-layers"></i> Review Cards
+            <a href="{{ route('flashcards.review') }}" class="btn btn-outline-info">
+                <i class="bi bi-layers me-1"></i> Review Cards
             </a>
-            <a href="{{ route('tasks.index') }}" class="btn-st-ghost">
-                <i class="bi bi-calendar-plus"></i> Plan Task
+            <a href="{{ route('tasks.index') }}" class="btn btn-outline-success">
+                <i class="bi bi-calendar-plus me-1"></i> Plan Task
             </a>
-            <a href="{{ route('exams.index') }}" class="btn-st-ghost">
-                <i class="bi bi-journal-check"></i> Add Exam
+            <a href="{{ route('exams.index') }}" class="btn btn-outline-danger">
+                <i class="bi bi-journal-check me-1"></i> Add Exam
             </a>
         </div>
     </div>
@@ -287,14 +221,17 @@ const weeklyData = @json($weeklyData);
 new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: weeklyData.map(d => new Date(d.date).toLocaleDateString('en', {weekday:'short'})),
+        labels: weeklyData.map(d => {
+            const date = new Date(d.date);
+            return date.toLocaleDateString('en', {weekday:'short'});
+        }),
         datasets: [{
             label: 'Minutes',
             data: weeklyData.map(d => d.minutes),
             backgroundColor: weeklyData.map((d,i) =>
                 i === weeklyData.length-1
-                    ? 'rgba(0,212,170,.85)'
-                    : 'rgba(0,212,170,.2)'
+                    ? 'rgba(99,102,241,0.9)'
+                    : 'rgba(99,102,241,0.35)'
             ),
             borderRadius: 8,
             borderSkipped: false,
@@ -304,19 +241,15 @@ new Chart(ctx, {
         responsive: true,
         plugins: { legend: { display: false } },
         scales: {
-            y: {
-                beginAtZero: true,
-                grid: { color: 'rgba(255,255,255,.04)' },
-                ticks: { color: '#6b7a99', font: { family: 'DM Sans' } }
-            },
-            x: {
-                grid: { display: false },
-                ticks: { color: '#6b7a99', font: { family: 'DM Sans' } }
-            }
+            y: { beginAtZero: true, grid: { color:'rgba(0,0,0,.04)' }, ticks:{color:'#999'} },
+            x: { grid: { display: false }, ticks:{color:'#999'} }
         }
     }
 });
 
-document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+// Tooltips
+document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    new bootstrap.Tooltip(el);
+});
 </script>
 @endpush
