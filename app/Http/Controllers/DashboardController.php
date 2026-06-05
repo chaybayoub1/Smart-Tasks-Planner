@@ -28,6 +28,8 @@ class DashboardController extends Controller
 
         $upcomingTasks = $user->tasks()
             ->with('subject')
+            ->withCount('completedPomodoroSessions')
+            ->withSum('completedPomodoroSessions', 'duration')
             ->where('status', '!=', 'completed')
             ->whereBetween('due_date', [now()->toDateString(), now()->addDays(7)->toDateString()])
             ->orderBy('due_date')

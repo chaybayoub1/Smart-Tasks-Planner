@@ -12,13 +12,32 @@ class Task extends Model
 
     protected $fillable = [
         'user_id','subject_id','title','description',
-        'due_date','duration','priority','status'
+        'due_date','priority','status'
     ];
 
     protected $casts = ['due_date' => 'date'];
 
     public function user()    { return $this->belongsTo(User::class); }
     public function subject() { return $this->belongsTo(Subject::class); }
+    public function pomodoroSessions() { return $this->hasMany(PomodoroSession::class); }
+    public function completedPomodoroSessions()
+    {
+        return $this->pomodoroSessions()
+            ->where('completed', true)
+            ->where('type', 'focus');
+    }
+
+    public function completedPomodoroCount(): int
+    {
+        return (int) ($this->completed_pomodoro_sessions_count
+            ?? $this->completedPomodoroSessions()->count());
+    }
+
+    public function studiedMinutes(): int
+    {
+        return (int) ($this->completed_pomodoro_sessions_sum_duration
+            ?? $this->completedPomodoroSessions()->sum('duration'));
+    }
 
     public function isOverdue(): bool
     {

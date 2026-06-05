@@ -73,6 +73,19 @@
                     </select>
                 </div>
 
+                {{-- Task picker --}}
+                <div class="mb-3 text-start">
+                    <label class="form-label small fw-500 text-muted">
+                        Link to Task (optional)
+                    </label>
+                    <select id="taskSelect" class="form-select form-select-sm">
+                        <option value="">No task</option>
+                        @foreach($tasks as $task)
+                            <option value="{{ $task->id }}">{{ $task->title }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 {{-- Custom duration --}}
                 <div class="mb-4 text-start">
                     <label class="form-label small fw-500 text-muted">
@@ -159,6 +172,9 @@
                                 — <span style="color:{{ $session->subject->color }}">
                                     {{ $session->subject->name }}
                                   </span>
+                            @endif
+                            @if($session->task)
+                                — <span class="text-muted">{{ $session->task->title }}</span>
                             @endif
                         </div>
                         <div class="text-muted" style="font-size:.75rem">
@@ -413,6 +429,7 @@ async function saveSession(completed, durationSeconds) {
             },
             body: JSON.stringify({
                 subject_id: document.getElementById('subjectSelect').value || null,
+                task_id:    document.getElementById('taskSelect').value || null,
                 duration:   Math.max(1, Math.round(durationSeconds / 60)),
                 type:       state.mode,
                 completed,
@@ -439,6 +456,8 @@ function prependRow(data, durationSeconds) {
                             .replace(/\b\w/g, ch => ch.toUpperCase());
     const sel   = document.getElementById('subjectSelect');
     const subj  = sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].text : '';
+    const taskSel = document.getElementById('taskSelect');
+    const task = taskSel.selectedIndex > 0 ? taskSel.options[taskSel.selectedIndex].text : '';
 
     const row = document.createElement('div');
     row.className = 'd-flex align-items-center gap-3 px-3 py-2 border-bottom';
@@ -446,7 +465,7 @@ function prependRow(data, durationSeconds) {
     row.innerHTML = `
         <div class="text-center" style="width:44px">${emoji}</div>
         <div class="flex-grow-1">
-            <div class="fw-500 small">${name}${subj ? ` — ${subj}` : ''}</div>
+            <div class="fw-500 small">${name}${subj ? ` — ${subj}` : ''}${task ? ` — ${task}` : ''}</div>
             <div class="text-muted" style="font-size:.75rem">
                 Just now · ${Math.round(durationSeconds / 60)} min
             </div>

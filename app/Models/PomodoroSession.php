@@ -11,7 +11,7 @@ class PomodoroSession extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id','subject_id','duration','type',
+        'user_id','subject_id','task_id','duration','type',
         'completed','xp_earned','started_at','ended_at'
     ];
 
@@ -23,4 +23,5 @@ class PomodoroSession extends Model
 
     public function user()    { return $this->belongsTo(User::class); }
     public function subject() { return $this->belongsTo(Subject::class); }
+    public function task()    { return $this->belongsTo(Task::class); }
 }

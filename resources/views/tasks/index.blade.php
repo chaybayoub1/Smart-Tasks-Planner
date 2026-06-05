@@ -3,6 +3,10 @@
 @section('title', 'Study Planner')
 @section('page-title', 'Study Planner')
 
+@push('styles')
+    @include('dashboard.partials._dashboard_styles')
+@endpush
+
 @section('content')
 <div class="row g-4">
 
@@ -38,10 +42,6 @@
                                 <label class="form-label fw-500 small">Due Date *</label>
                                 <input type="date" name="due_date" class="form-control" value="{{ old('due_date', today()->toDateString()) }}" required>
                             </div>
-                            <div class="col-md-1">
-                                <label class="form-label fw-500 small">Mins *</label>
-                                <input type="number" name="duration" class="form-control" value="{{ old('duration', 60) }}" min="1" max="1440" required>
-                            </div>
                             <div class="col-md-2">
                                 <label class="form-label fw-500 small">Priority</label>
                                 <select name="priority" class="form-select">
@@ -50,7 +50,7 @@
                                     <option value="high">🔴 High</option>
                                 </select>
                             </div>
-                            <div class="col-md-1 d-flex align-items-end">
+                            <div class="col-md-2 d-flex align-items-end">
                                 <button class="btn btn-primary w-100">Add</button>
                             </div>
                             <div class="col-12">
@@ -171,46 +171,49 @@
         </form>
 
         {{-- Task cards --}}
-        <div class="d-flex flex-column gap-2">
+        <div class="d-flex flex-column gap-3">
             @forelse($tasks as $task)
-            <div class="card {{ $task->isOverdue() ? 'border-danger border-opacity-50' : '' }}">
-                <div class="card-body py-2 px-3">
-                    <div class="d-flex align-items-center gap-3">
+            <div class="card planner-task-card {{ $task->isOverdue() ? 'is-overdue' : '' }} {{ $task->status === 'completed' ? 'is-completed' : '' }}">
+                <div class="card-body planner-task-card-body">
+                    <div class="d-flex align-items-start gap-3">
                         {{-- Toggle button --}}
                         <form method="POST" action="{{ route('tasks.toggle', $task) }}">
                             @csrf @method('PATCH')
-                            <button class="btn btn-sm p-0 border-0 text-{{ $task->status === 'completed' ? 'success' : 'secondary' }}">
-                                <i class="bi bi-{{ $task->status === 'completed' ? 'check-circle-fill' : 'circle' }} fs-4"></i>
+                            <button class="planner-task-toggle {{ $task->status === 'completed' ? 'is-done' : '' }}" aria-label="Toggle task status">
+                                <i class="bi bi-{{ $task->status === 'completed' ? 'check-circle-fill' : 'circle' }}"></i>
                             </button>
                         </form>
 
                         {{-- Info --}}
                         <div class="flex-grow-1 min-w-0">
-                            <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <span class="fw-500 {{ $task->status === 'completed' ? 'text-decoration-line-through text-muted' : '' }}">
+                            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                <span class="planner-task-title {{ $task->status === 'completed' ? 'text-decoration-line-through text-muted' : '' }}">
                                     {{ $task->title }}
                                 </span>
-                                <span class="badge text-bg-{{ $task->priorityBadgeClass() }}">{{ $task->priority }}</span>
-                                <span class="badge text-bg-{{ $task->statusBadgeClass() }}">{{ str_replace('_',' ',$task->status) }}</span>
+                                <span class="planner-task-badge priority-{{ $task->priority }}">{{ $task->priority }}</span>
+                                <span class="planner-task-badge status-{{ $task->status }}">{{ str_replace('_',' ',$task->status) }}</span>
                                 @if($task->isOverdue())
-                                    <span class="badge text-bg-danger">Overdue</span>
+                                    <span class="planner-task-badge is-overdue">Overdue</span>
                                 @endif
                             </div>
-                            <div class="small text-muted d-flex gap-2 flex-wrap mt-1">
+                            <div class="planner-task-meta d-flex gap-3 flex-wrap">
                                 @if($task->subject)
-                                    <span><span class="rounded-circle d-inline-block me-1" style="width:8px;height:8px;background:{{ $task->subject->color }}"></span>{{ $task->subject->name }}</span>
+                                    <span><span class="planner-task-dot" style="background:{{ $task->subject->color }}"></span>{{ $task->subject->name }}</span>
                                 @endif
                                 <span><i class="bi bi-calendar3"></i> {{ $task->due_date->format('M d, Y') }}</span>
-                                <span><i class="bi bi-clock"></i> {{ $task->duration }}min</span>
+                                <span>
+                                    <i class="bi bi-stopwatch"></i>
+                                    {{ $task->completedPomodoroCount() }} {{ \Illuminate\Support\Str::plural('session', $task->completedPomodoroCount()) }} &bull; {{ $task->studiedMinutes() }}min studied
+                                </span>
                             </div>
                         </div>
 
                         {{-- Actions --}}
-                        <div class="d-flex gap-1">
-                            <a href="{{ route('tasks.edit', $task) }}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+                        <div class="planner-task-actions">
+                            <a href="{{ route('tasks.edit', $task) }}" class="planner-task-action" aria-label="Edit task"><i class="bi bi-pencil"></i></a>
                             <form method="POST" action="{{ route('tasks.destroy', $task) }}" onsubmit="return confirm('Delete task?')">
                                 @csrf @method('DELETE')
-                                <button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button>
+                                <button class="planner-task-action is-danger" aria-label="Delete task"><i class="bi bi-trash"></i></button>
                             </form>
                         </div>
                     </div>

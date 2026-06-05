@@ -31,11 +31,7 @@
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-500">Duration (min) *</label>
-                            <input type="number" name="duration" class="form-control" value="{{ old('duration', $task->duration) }}" min="1" max="1440" required>
-                        </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label fw-500">Priority</label>
                             <select name="priority" class="form-select">
                                 @foreach(['low','medium','high'] as $p)
@@ -43,7 +39,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label fw-500">Status</label>
                             <select name="status" class="form-select">
                                 @foreach(['pending','in_progress','completed'] as $s)

@@ -204,6 +204,146 @@
 }
 .notif-card-header i, .task-list-card-header i { color: var(--db-indigo); }
 
+/* ── Study Planner Task Cards ───────────────────────────── */
+.planner-task-card {
+    border: 1px solid var(--db-border);
+    border-radius: var(--db-radius);
+    box-shadow: var(--db-shadow);
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.planner-task-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(99,102,241,.28);
+    box-shadow: var(--db-shadow-hover);
+}
+.planner-task-card.is-overdue {
+    border-color: rgba(244,63,94,.35);
+    box-shadow: 0 2px 14px rgba(244,63,94,.08), 0 1px 3px rgba(0,0,0,.04);
+}
+.planner-task-card.is-completed {
+    background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
+}
+.planner-task-card-body {
+    padding: 16px 18px;
+}
+.planner-task-toggle {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--db-surface2);
+    color: var(--db-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: color .16s ease, background .16s ease, transform .16s ease;
+}
+.planner-task-toggle:hover {
+    color: var(--db-indigo);
+    background: rgba(99,102,241,.1);
+    transform: scale(1.04);
+}
+.planner-task-toggle.is-done {
+    color: var(--db-emerald);
+    background: rgba(16,185,129,.1);
+}
+.planner-task-title {
+    font-size: .96rem;
+    font-weight: 700;
+    color: var(--db-text);
+    line-height: 1.35;
+}
+.planner-task-meta {
+    font-size: .76rem;
+    color: var(--db-muted);
+    line-height: 1.4;
+}
+.planner-task-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.planner-task-meta i {
+    color: var(--db-indigo);
+    font-size: .78rem;
+}
+.planner-task-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 3px rgba(99,102,241,.08);
+}
+.planner-task-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: .64rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.planner-task-badge.priority-high,
+.planner-task-badge.is-overdue {
+    background: rgba(244,63,94,.1);
+    color: var(--db-rose);
+}
+.planner-task-badge.priority-medium {
+    background: rgba(245,158,11,.12);
+    color: #b45309;
+}
+.planner-task-badge.priority-low {
+    background: rgba(16,185,129,.1);
+    color: var(--db-emerald);
+}
+.planner-task-badge.status-completed {
+    background: rgba(16,185,129,.1);
+    color: var(--db-emerald);
+}
+.planner-task-badge.status-in_progress {
+    background: rgba(99,102,241,.11);
+    color: var(--db-indigo);
+}
+.planner-task-badge.status-pending {
+    background: var(--db-surface2);
+    color: var(--db-muted);
+}
+.planner-task-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.planner-task-action {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--db-border);
+    border-radius: 10px;
+    background: var(--db-surface2);
+    color: var(--db-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: color .16s ease, background .16s ease, border-color .16s ease, transform .16s ease;
+}
+.planner-task-action:hover {
+    color: var(--db-indigo);
+    background: #fff;
+    border-color: rgba(99,102,241,.3);
+    transform: translateY(-1px);
+}
+.planner-task-action.is-danger:hover {
+    color: var(--db-rose);
+    border-color: rgba(244,63,94,.28);
+    background: rgba(244,63,94,.06);
+}
+
 /* ── XP / Level Card ──────────────────────────────────────── */
 .xp-card {
     background: linear-gradient(135deg, var(--db-indigo), var(--db-violet));

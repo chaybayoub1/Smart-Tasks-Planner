@@ -3,10 +3,10 @@
 
     Purpose  : Scrollable list of the user's next upcoming tasks with
                inline toggle-complete forms, subject badge, due date,
-               duration, and priority badge.
+               completed Pomodoro study time, and priority badge.
     Included : dashboard/partials/_activity_row.blade.php
     Data     : $upcomingTasks (Collection<Task>)
-               Each task exposes: title, status, due_date, duration,
+               Each task exposes: title, status, due_date,
                priority, subject (relation), priorityBadgeClass().
 --}}
 <div class="task-list-card h-100">
@@ -31,7 +31,7 @@
                 @if($task->subject)
                     <span class="badge me-1" style="background:{{ $task->subject->color }}20;color:{{ $task->subject->color }};font-size:.65rem;">{{ $task->subject->name }}</span>
                 @endif
-                {{ $task->due_date->format('M d') }} · {{ $task->duration }}min
+                {{ $task->due_date->format('M d') }} · {{ $task->completedPomodoroCount() }} {{ \Illuminate\Support\Str::plural('session', $task->completedPomodoroCount()) }} · {{ $task->studiedMinutes() }}min studied
             </div>
         </div>
         <span class="badge text-bg-{{ $task->priorityBadgeClass() }}" style="font-size:.65rem;">{{ $task->priority }}</span>

@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\PomodoroSession;
 use App\Services\GamificationService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PomodoroController extends Controller
 {
@@ -15,9 +16,13 @@ class PomodoroController extends Controller
     {
         $user     = auth()->user();
         $subjects = $user->subjects()->get();
+        $tasks    = $user->tasks()
+            ->where('status', '!=', 'completed')
+            ->orderBy('due_date')
+            ->get();
 
         $recentSessions = $user->pomodoroSessions()
-            ->with('subject')
+            ->with(['subject', 'task'])
             ->orderByDesc('created_at')
             ->take(10)
             ->get();
@@ -30,7 +35,7 @@ class PomodoroController extends Controller
 
         $totalSessions = $user->pomodoroSessions()->where('completed', true)->count();
 
-        return view('pomodoro.index', compact('subjects', 'recentSessions', 'todayMinutes', 'totalSessions'));
+        return view('pomodoro.index', compact('subjects', 'tasks', 'recentSessions', 'todayMinutes', 'totalSessions'));
     }
 
     /**
@@ -38,15 +43,20 @@ class PomodoroController extends Controller
      */
     public function store(Request $request)
     {
+        $user = auth()->user();
+
         $data = $request->validate([
             'subject_id'  => 'nullable|exists:subjects,id',
+            'task_id'     => [
+                'nullable',
+                Rule::exists('tasks', 'id')->where(fn ($query) => $query->where('user_id', $user->id)),
+            ],
             'duration'    => 'required|integer|min:1',
             'type'        => 'required|in:focus,short_break,long_break',
             'completed'   => 'required|boolean',
             'started_at'  => 'nullable|date',
         ]);
 
-        $user = auth()->user();
         $xp   = 0;
 
         if ($data['completed'] && $data['type'] === 'focus') {

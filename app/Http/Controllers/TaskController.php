@@ -13,7 +13,10 @@ class TaskController extends Controller
         $user     = auth()->user();
         $subjects = $user->subjects()->get();
 
-        $query = $user->tasks()->with('subject');
+        $query = $user->tasks()
+            ->with('subject')
+            ->withCount('completedPomodoroSessions')
+            ->withSum('completedPomodoroSessions', 'duration');
 
         // Filters
         if ($request->filled('subject_id')) {
@@ -48,7 +51,6 @@ class TaskController extends Controller
             'subject_id'  => 'nullable|exists:subjects,id',
             'description' => 'nullable|string',
             'due_date'    => 'required|date',
-            'duration'    => 'required|integer|min:1|max:1440',
             'priority'    => 'required|in:low,medium,high',
         ]);
 
@@ -72,7 +74,6 @@ class TaskController extends Controller
             'subject_id'  => 'nullable|exists:subjects,id',
             'description' => 'nullable|string',
             'due_date'    => 'required|date',
-            'duration'    => 'required|integer|min:1|max:1440',
             'priority'    => 'required|in:low,medium,high',
             'status'      => 'required|in:pending,in_progress,completed',
         ]);

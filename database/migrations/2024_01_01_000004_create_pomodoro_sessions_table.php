@@ -13,6 +13,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('subject_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('task_id')->nullable()->constrained()->nullOnDelete();
             $table->integer('duration')->default(25); // minutes
             $table->enum('type', ['focus', 'short_break', 'long_break'])->default('focus');
             $table->boolean('completed')->default(false);
