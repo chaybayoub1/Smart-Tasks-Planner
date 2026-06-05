@@ -4,6 +4,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 use App\Services\GamificationService;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,6 +16,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        Paginator::useBootstrap();
     }
 }
