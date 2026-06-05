@@ -32,6 +32,14 @@ class User extends Authenticatable
     public function flashcards()       { return $this->hasMany(Flashcard::class); }
     public function exams()            { return $this->hasMany(Exam::class); }
     public function badges()           { return $this->belongsToMany(Badge::class, 'user_badges')->withPivot('earned_at'); }
+    public function ownedGroups()      { return $this->hasMany(CollaborationGroup::class, 'owner_id'); }
+    public function collaborationGroups()
+    {
+        return $this->belongsToMany(CollaborationGroup::class, 'collaboration_group_members', 'user_id', 'group_id')
+            ->withPivot('role', 'joined_at')
+            ->withTimestamps();
+    }
+    public function assignedTasks()    { return $this->hasMany(Task::class, 'assigned_to'); }
 
     // ── Gamification helpers ──────────────────────────────────────────────────
 

@@ -280,6 +280,9 @@
             <a href="{{ route('statistics.index') }}"  class="{{ request()->routeIs('statistics.*') ? 'active' : '' }}">
                 <i class="bi bi-graph-up-arrow"></i> Statistiques
             </a>
+            <a href="{{ route('groups.index') }}"       class="{{ request()->routeIs('groups.*') ? 'active' : '' }}">
+                <i class="bi bi-people-fill"></i> Collaboration
+            </a>
 
             <div class="nav-section-label">Learning</div>
             <a href="{{ route('notes.index') }}"       class="{{ request()->routeIs('notes.*') ? 'active' : '' }}">
