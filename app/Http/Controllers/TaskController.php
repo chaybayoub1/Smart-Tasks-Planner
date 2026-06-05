@@ -16,7 +16,8 @@ class TaskController extends Controller
         $query = $user->tasks()
             ->with('subject')
             ->withCount('completedPomodoroSessions')
-            ->withSum('completedPomodoroSessions', 'duration');
+            ->withSum('completedPomodoroSessions', 'duration')
+            ->whereNull('group_id');
 
         // Filters
         if ($request->filled('subject_id')) {
@@ -35,6 +36,7 @@ class TaskController extends Controller
         $month      = $request->get('month', now()->month);
         $year       = $request->get('year', now()->year);
         $calTasks   = $user->tasks()
+            ->whereNull('group_id')
             ->whereMonth('due_date', $month)
             ->whereYear('due_date', $year)
             ->with('subject')

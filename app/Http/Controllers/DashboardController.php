@@ -30,6 +30,7 @@ class DashboardController extends Controller
             ->with('subject')
             ->withCount('completedPomodoroSessions')
             ->withSum('completedPomodoroSessions', 'duration')
+            ->whereNull('group_id')
             ->where('status', '!=', 'completed')
             ->whereBetween('due_date', [now()->toDateString(), now()->addDays(7)->toDateString()])
             ->orderBy('due_date')

@@ -11,7 +11,7 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id','subject_id','title','description',
+        'user_id','group_id','assigned_to','subject_id','title','description',
         'due_date','priority','status'
     ];
 
@@ -19,6 +19,8 @@ class Task extends Model
 
     public function user()    { return $this->belongsTo(User::class); }
     public function subject() { return $this->belongsTo(Subject::class); }
+    public function group()   { return $this->belongsTo(CollaborationGroup::class, 'group_id'); }
+    public function assignee(){ return $this->belongsTo(User::class, 'assigned_to'); }
     public function pomodoroSessions() { return $this->hasMany(PomodoroSession::class); }
     public function completedPomodoroSessions()
     {

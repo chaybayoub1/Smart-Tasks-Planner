@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PomodoroSession;
+use App\Models\Task;
 use App\Services\GamificationService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -16,7 +17,11 @@ class PomodoroController extends Controller
     {
         $user     = auth()->user();
         $subjects = $user->subjects()->get();
-        $tasks    = $user->tasks()
+        $tasks    = Task::query()
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhere('assigned_to', $user->id);
+            })
             ->where('status', '!=', 'completed')
             ->orderBy('due_date')
             ->get();
@@ -49,7 +54,10 @@ class PomodoroController extends Controller
             'subject_id'  => 'nullable|exists:subjects,id',
             'task_id'     => [
                 'nullable',
-                Rule::exists('tasks', 'id')->where(fn ($query) => $query->where('user_id', $user->id)),
+                Rule::exists('tasks', 'id')->where(fn ($query) => $query->where(function ($query) use ($user) {
+                    $query->where('user_id', $user->id)
+                        ->orWhere('assigned_to', $user->id);
+                })),
             ],
             'duration'    => 'required|integer|min:1',
             'type'        => 'required|in:focus,short_break,long_break',
